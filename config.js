@@ -1,5 +1,3 @@
-const apaxNpmrc = process.env.RENOVATE_NPMRC;
-
 const prFooter = `:space_invader: :sparkles: This merge request is proudly presented by [Renovate Bot](https://code.siemens.com/ax/devops/renovate-bot).`;
 const autodiscoverFilter = "simatic-ax/*";
 module.exports = {
@@ -47,34 +45,5 @@ module.exports = {
                 String.raw`#\s*renovate:\s+datasource=(?<datasource>.*?)\s+depName=(?<depName>[\.\w]+)[\s-]+[\w]+_VERSION\s*=\s*"?(?<currentValue>[\d\.^\-\w]*)"?`,
             ],
         },
-    ],
-    packageRules: [
-        {
-            // Set endpoint and credentials for the Apax registry
-            matchPaths: ["**/{test.,test-windows.,}apax.y{a,}ml"],
-            npmrc: apaxNpmrc,
-        },
-        {
-            // Ensure lock files are updated
-            matchPaths: ["**/apax.y{a,}ml"],
-            postUpgradeTasks: {
-                // Switch to the directory of the apax.yml and update the lock file if it exists.
-                commands: [
-                    `
-          cd ./{{{packageFileDir}}} && 
-          if test -f apax-lock.json; then 
-            if apax install; then
-              echo Successfully updated lock file.
-            else
-              echo Failed to update lock file.
-            fi
-          else
-            echo No lock file to update.
-          fi
-        `,
-                ],
-                fileFilters: ["**/apax-lock.json"],
-            },
-        },
-    ],
+    ]
 };

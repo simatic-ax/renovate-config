@@ -1,0 +1,39 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [ "simatic-ax/renovate-config" ],
+  "dependencyDashboard": true,
+  "enabledManagers": [
+    "github-actions"
+  ],
+  // "automerge": true,
+  // "ignoreTests": true,
+  "packageRules": [
+    {
+      // Set endpoint and credentials for the Apax registry
+      "matchPaths": [ "**/{test.,test-windows.,}apax.y{a,}ml" ],
+      "npmrc": "process.env.RENOVATE_NPMRC"
+    }//,
+    //{
+    //  // Ensure lock files are updated
+    //  "matchPaths": ["**/apax.y{a,}ml"],
+    //  "postUpgradeTasks": {
+    //    // Switch to the directory of the apax.yml and update the lock file if it exists.
+    //    "commands": [
+    //      `
+    //      cd ./{{{packageFileDir}}} && 
+    //      if test -f apax-lock.json; then 
+    //        if apax install; then
+    //          echo Successfully updated lock file.
+    //        else
+    //          echo Failed to update lock file.
+    //        fi
+    //      else
+    //        echo No lock file to update.
+    //      fi
+    //      `,
+    //    ],
+    //    fileFilters: ["**/apax-lock.json"],
+    //  },
+    //},
+  ]
+}
