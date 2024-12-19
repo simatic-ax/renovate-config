@@ -1,0 +1,38 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Default preset for use with Renovate's repos",
+  "extends": [
+    "config:recommended"
+  ],
+  "prHeader": "AX Used Default Renovate Config",
+  "hostRules": [
+    {
+      "hostType": "npm",
+      "matchHost": "registry.simatic-ax.siemens.io",
+      "token": "process.env.RENOVATE_APAX_TOKEN"
+    }
+  ],
+  "customManagers": [
+        {
+	    "customType": "regex",
+            "fileMatch": ["(^|\\/)(test.|test-windows.)?apax.ya?ml$"],
+            "matchStrings": [
+                // We're using `String.raw` here so that the RegEx can be easily copied from/to other tools (e.g. https://regex101.com/)
+                String.raw`"(?<depName>@ax\/.*?)"\s*:\s*"?(?<currentValue>[\d\.^\-\w]*)"?`,
+            ],
+            "datasourceTemplate": "npm",
+            // Unfortunately setting the registryUrl here does not work properly.
+            // The registry can only be set via the `npmrc` property in the package rules.
+            // Seems to be an NPM-specific weird behavior of Renovate, maybe related to
+            // https://github.com/renovatebot/renovate/issues/4224
+            // registryUrlTemplate: "https://axciteme.siemens.com/registry/apax/"
+        },
+        {
+            "fileMatch": ["(^|\\/)(test.|test-windows.)?apax.ya?ml$"],
+            "matchStrings": [
+                // We're using `String.raw` here so that the RegEx can be easily copied from/to other tools (e.g. https://regex101.com/)
+                String.raw`#\s*renovate:\s+datasource=(?<datasource>.*?)\s+depName=(?<depName>[\.\w]+)[\s-]+[\w]+_VERSION\s*=\s*"?(?<currentValue>[\d\.^\-\w]*)"?`,
+            ],
+        },
+    ]
+}
