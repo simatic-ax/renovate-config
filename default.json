@@ -1,0 +1,33 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Default preset for use with Renovate's repos",
+  "extends": [
+    "config:recommended"
+  ],
+  "prHeader": "AX Used Default Renovate Config",
+  "hostRules": [
+    {
+      "hostType": "npm",
+      "matchHost": "registry.simatic-ax.siemens.io",
+      "token": "process.env.RENOVATE_APAX_TOKEN"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
+      "matchStrings": [
+        "\"(?<depName>@ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
+      ],
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
+      "matchStrings": [
+        "#\\s*renovate:\\s+datasource=(?<datasource>.*?)\\s+depName=(?<depName>[\\.\\w]+)[\\s-]+[\\w]+_VERSION\\s*=\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
+      ],
+      "datasourceTemplate": "npm"
+    }
+  ]
+}
