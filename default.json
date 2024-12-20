@@ -9,7 +9,7 @@
     {
       "hostType": "npm",
       "matchHost": "https://registry.simatic-ax.siemens.io",
-      "token": "secrets.RENOVATE_APAX_TOKEN"
+      "token": "{{ secrets.RENOVATE_APAX_TOKEN }}"
     }
   ],
   "customManagers": [
