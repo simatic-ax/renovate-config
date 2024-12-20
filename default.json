@@ -8,16 +8,26 @@
   "hostRules": [
     {
       "hostType": "npm",
-      "matchHost": "registry.simatic-ax.siemens.io",
+      "matchHost": "https://registry.simatic-ax.siemens.io",
       "token": "process.env.RENOVATE_APAX_TOKEN"
     }
   ],
   "customManagers": [
     {
       "customType": "regex",
+      "description": "In repository found ax dependencies",
       "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
       "matchStrings": [
         "\"(?<depName>@ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
+      ],
+      "datasourceTemplate": "npm"
+    },
+    {
+      "customType": "regex",
+      "description": "In repository found simatic-ax dependencies",
+      "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
+      "matchStrings": [
+        "\"(?<depName>@simatic-ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
       ],
       "datasourceTemplate": "npm"
     },
