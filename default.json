@@ -7,7 +7,7 @@
   "prHeader": "AX Used Default Renovate Config",
   "hostRules": [
     {
-      "hostType": "npm",
+      "hostType": "ax-npm",
       "matchHost": "https://registry.simatic-ax.siemens.io",
       "token": "{{ secrets.RENOVATE_APAX_TOKEN }}"
     },
@@ -24,7 +24,7 @@
       "matchStrings": [
         "\"(?<depName>@ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
       ],
-      "datasourceTemplate": "npm"
+      "datasourceTemplate": "ax-npm"
     },
     {
       "customType": "regex",
@@ -33,7 +33,7 @@
       "matchStrings": [
         "\"(?<depName>@simatic-ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
       ],
-      "datasourceTemplate": "npm"
+      "datasourceTemplate": "ax-npm"
     },
     {
       "customType": "regex",
@@ -41,7 +41,7 @@
       "matchStrings": [
         "#\\s*renovate:\\s+datasource=(?<datasource>.*?)\\s+depName=(?<depName>[\\.\\w]+)[\\s-]+[\\w]+_VERSION\\s*=\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
       ],
-      "datasourceTemplate": "npm"
+      "datasourceTemplate": "ax-npm"
     }
   ]
 }
