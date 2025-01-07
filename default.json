@@ -16,6 +16,14 @@
       "enabled": false
     }
   ],
+  "packageRules": [
+    {
+      "matchDataSources": [ "ax-npm" ],
+      "registryUrls": [
+        "https://registry.simatic-ax.siemens.io"
+      ]
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
