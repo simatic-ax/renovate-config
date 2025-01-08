@@ -7,7 +7,7 @@
   "prHeader": "AX Used Default Renovate Config",
   "hostRules": [
     {
-      "hostType": "ax-npm",
+      "hostType": "npm",
       "matchHost": "https://registry.simatic-ax.siemens.io",
       "token": "{{ secrets.RENOVATE_APAX_TOKEN }}"
     },
