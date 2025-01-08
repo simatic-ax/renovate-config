@@ -18,7 +18,7 @@
   ],
   "packageRules": [
     {
-      "matchDataSources": [ "ax-npm" ],
+      "matchDataSources": [ "npm" ],
       "registryUrls": [
         "https://registry.simatic-ax.siemens.io"
       ]
@@ -32,24 +32,24 @@
       "matchStrings": [
         "(?<depName>@ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)?"
       ],
-      "datasourceTemplate": "ax-npm"
-    },
-    {
-      "customType": "regex",
-      "description": "In repository found simatic-ax dependencies",
-      "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
-      "matchStrings": [
-        "(?<depName>@simatic-ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)?"
-      ],
-      "datasourceTemplate": "ax-npm"
-    },
-    {
-      "customType": "regex",
-      "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
-      "matchStrings": [
-        "#\\s*renovate:\\s+datasource=(?<datasource>.*?)\\s+depName=(?<depName>[\\.\\w]+)[\\s-]+[\\w]+_VERSION\\s*=\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
-      ],
-      "datasourceTemplate": "ax-npm"
-    }
+      "datasourceTemplate": "npm"
+    }//,
+    //{
+    //  "customType": "regex",
+    //  "description": "In repository found simatic-ax dependencies",
+    //  "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
+    //  "matchStrings": [
+    //    "(?<depName>@simatic-ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)?"
+    //  ],
+    //  "datasourceTemplate": "ax-github"
+    //},
+    //{
+    //  "customType": "regex",
+    //  "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
+    //  "matchStrings": [
+    //    "#\\s*renovate:\\s+datasource=(?<datasource>.*?)\\s+depName=(?<depName>[\\.\\w]+)[\\s-]+[\\w]+_VERSION\\s*=\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
+    //  ],
+    //  "datasourceTemplate": "ax-prod"
+    //}
   ]
 }
