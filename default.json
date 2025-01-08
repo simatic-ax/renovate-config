@@ -30,7 +30,7 @@
       "description": "In repository found ax dependencies",
       "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
       "matchStrings": [
-        "\"(?<depName>@ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
+        "(?<depName>@ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)?"
       ],
       "datasourceTemplate": "ax-npm"
     },
@@ -39,7 +39,7 @@
       "description": "In repository found simatic-ax dependencies",
       "fileMatch": [ "(^|\\/)(test.|test-windows.)?apax.ya?ml$" ],
       "matchStrings": [
-        "\"(?<depName>@simatic-ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)\"?"
+        "(?<depName>@simatic-ax\\/.*?)\"\\s*:\\s*\"?(?<currentValue>[\\d\\.^\\-\\w]*)?"
       ],
       "datasourceTemplate": "ax-npm"
     },
