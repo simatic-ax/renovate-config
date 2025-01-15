@@ -5,7 +5,6 @@ const autodiscoverFilter = "simatic-ax/ae-hw-engineering";  // "simatic-ax/*"
 module.exports = {
   platform: "github",
   groupName: "all",
-  updateType: "major",
   gitAuthor: "simatic-ax-bot <ax-public@gmx.de>",
   prFooter: prFooter,
   requireConfig: "required",
@@ -79,4 +78,22 @@ module.exports = {
       },
     },
   ],
+  packageRules: [
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "all container images",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"]
+    },
+    {
+      "matchPackagePatterns": ["^[Aa][Xx]"],
+      "groupName": "AX Product Dependencies",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
+    },
+    {
+    // ax simatic dependencies separated because of breaking changes
+      "matchPackagePatterns": ["^[Ss][Ii][Mm][Aa][Tt][Ii][Cc]-[Aa][Xx]"],
+      "groupName": "AX Github Comunity",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
+    }
+  ]
 };
