@@ -77,8 +77,6 @@ module.exports = {
         fileFilters: ["**/apax-lock.json"],
       },
     },
-  ],
-  packageRules: [
     {
       "matchDatasources": ["docker"],
       "groupName": "all container images",
