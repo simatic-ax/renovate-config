@@ -5,7 +5,6 @@ const autodiscoverFilter = "simatic-ax/ae-hw-engineering";  // "simatic-ax/*"
 module.exports = {
   platform: "github",
   groupName: "all",
-  dependencyDashboard: true,
   gitAuthor: "simatic-ax-bot <ax-public@gmx.de>",
   prFooter: prFooter,
   requireConfig: "required",
