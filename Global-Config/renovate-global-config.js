@@ -83,13 +83,13 @@ module.exports = {
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"]
     },
     {
-      "matchPackagePatterns": ["^[Aa][Xx]"],
+      "matchPackagePatterns": ["^@{0,1}[Aa][Xx]"],
       "groupName": "AX Product Dependencies",
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
     },
     {
     // ax simatic dependencies separated because of breaking changes
-      "matchPackagePatterns": ["^[Ss][Ii][Mm][Aa][Tt][Ii][Cc]-[Aa][Xx]"],
+      "matchPackagePatterns": ["^@{0,1}[Ss][Ii][Mm][Aa][Tt][Ii][Cc]-[Aa][Xx]"],
       "groupName": "AX Github Comunity",
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
     }
