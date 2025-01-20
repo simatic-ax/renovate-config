@@ -1,7 +1,7 @@
 const apaxNpmrc = process.env.RENOVATE_NPMRC;
 
 const prFooter = `:space_invader: :sparkles: This merge request is proudly presented by [Renovate Bot](https://code.siemens.com/ax/devops/renovate-bot).`;
-const autodiscoverFilter = "simatic-ax/ae-hw-engineering";  // "simatic-ax/*"
+const autodiscoverFilter = "simatic-ax/*";
 module.exports = {
   platform: "github",
   groupName: "all",
