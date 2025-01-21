@@ -5,6 +5,12 @@ Configuration for renovate Bot
 
 ## Setup
 
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+}
+```
+
 ### Link to AX Prod regestry
 
 ### Pull Request Settings
