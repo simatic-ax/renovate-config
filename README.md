@@ -5,6 +5,8 @@ Configuration for renovate Bot
 
 ## Setup
 
+To activate the renovate you have to create the file **renovate.json*+* in the route of the repose story, which has the following content:
+
 ```json
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json"
