@@ -5,14 +5,16 @@ For suggestions for improvement, please write an issue or contact one of the cod
 
 # General structure
 
-## Execution
-
-
+The execution is carried out via the [renovate action](https://github.com/simatic-ax/renovate-config/blob/chore/set_up_renovate/.github/workflows/renovate.yml), which can be found in the .github\workflows folder.
 
 The global configuration for Renovate is managed in the Global-Config folder. The main files are:
 
-Global-Config/renovate-entrypoint.sh: This script sets up the environment and installs necessary dependencies for Renovate.
-Global-Config/renovate-global-config.js: This file contains the global configuration settings for Renovate, including package rules and update strategies.
+- Global-Config/renovate-entrypoint.sh: This script sets up the environment and installs necessary dependencies for Renovate.
+- Global-Config/renovate-global-config.js: This file contains the global configuration settings for Renovate, including package rules and update strategies.
+
+## Execution
+
+
 
 
 ## Setup
