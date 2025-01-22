@@ -5,6 +5,8 @@ The basic settings are described below. There is also more detailed information 
 
 For suggestions for improvement, please write an issue or contact one of the code owners listed [here](./CODEOWNERS)
 
+The basis for execute the renovate is the [renovate CLI](https://docs.renovatebot.com/)
+
 # General structure
 
 The execution is carried out via the [renovate action](https://github.com/simatic-ax/renovate-config/blob/chore/set_up_renovate/.github/workflows/renovate.yml), which can be found in the .github\workflows folder.
