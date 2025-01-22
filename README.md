@@ -49,9 +49,8 @@ For example, here is a configuration that also switches on the dashboard locally
 ```json
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  separateMajorMinor: true,
-  dependencyDashboard: true
-
+  "separateMajorMinor": true,
+  "dependencyDashboard": true
 }
 ```
 
