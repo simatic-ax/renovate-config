@@ -1,3 +1,5 @@
+![main](https://docs.renovatebot.com/assets/images/mend-renovate-cli-banner.jpg)
+
 The basic settings for the Renovate are stored in this repository. Additionally, the job for execution is located here. 
 The basic settings are described below. There is also more detailed information about the structure and how you can adapt it accordingly.
 
