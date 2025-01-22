@@ -5,6 +5,7 @@ const autodiscoverFilter = "simatic-ax/*";
 module.exports = {
   platform: "github",
   groupName: "all",
+  separateMajorMinor: false,
   gitAuthor: "simatic-ax-bot <ax-public@gmx.de>",
   prFooter: prFooter,
   requireConfig: "required",
@@ -77,5 +78,21 @@ module.exports = {
         fileFilters: ["**/apax-lock.json"],
       },
     },
-  ],
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "all container images",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"]
+    },
+    {
+      "matchPackagePatterns": ["^@{0,1}[Aa][Xx]"],
+      "groupName": "AX Product Dependencies",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
+    },
+    {
+    // ax simatic dependencies separated because of breaking changes
+      "matchPackagePatterns": ["^@{0,1}[Ss][Ii][Mm][Aa][Tt][Ii][Cc]-[Aa][Xx]"],
+      "groupName": "AX Github Comunity",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
+    }
+  ]
 };
