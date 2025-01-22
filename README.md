@@ -26,7 +26,7 @@ However, the settings can be overwritten locally; information about this can be 
 
 ## Execution
 
-The job for the renovate is running once a week on weekend. 
+The job for the renovate is running once a week on weekend. **At the moment still manually**
 It checks all reposetories that are stored in the space named Ax - see config file with the setting: autodiscoverFilter = "simatic-ax/*"
 
 # Local Setup

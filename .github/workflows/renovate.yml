@@ -1,6 +1,6 @@
 name: renovate
 on:
-  workflow_dispatch:
+  workflow_dispatch: # by change adapt readme
 
 jobs:
   renovate:
