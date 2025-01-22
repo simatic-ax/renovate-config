@@ -1,7 +1,7 @@
 The basic settings for the Renovate are stored in this repose story. Additionally, the job for execution is located here. 
 The basic settings are described below. There is also more detailed information about the structure and how you can adapt it accordingly.
 
-For suggestions for improvement, please write an issue or contact one of the code owners listed [here](https://github.com/simatic-ax/renovate-config/blob/main/CODEOWNERS)
+For suggestions for improvement, please write an issue or contact one of the code owners listed [here](./CODEOWNERS)
 
 # General structure
 
@@ -22,16 +22,14 @@ A few things are preset in the general config files for clarity. These are as fo
 	- They are divided into the categories "ax", "simatic", "dockerimges" and "everything else".
 	- In each category, all dependencies of the type are displayed and all types of changes, e.g. "major" and "minor", are summarized in one pull request
 
-However, the settings can be overwritten locally; information about this can be found here.
-
-
+However, the settings can be overwritten locally; information about this can be found [here](#local-adaptation).
 
 ## Execution
 
 The job for the renovate is running once a week on weekend. 
 It checks all reposetories that are stored in the space named Ax - see config file with the setting: autodiscoverFilter = "simatic-ax/*"
 
-## Local Setup
+# Local Setup
 
 To activate the renovate you have to create the file **renovate.json** in the route of the repose story, which has the following content:
 
@@ -41,13 +39,20 @@ To activate the renovate you have to create the file **renovate.json** in the ro
 }
 ```
 
+## Local adaptation
 
+The changes that are made locally are made in the created **renovate.json**.
 
+The settings made here overwrite the global setting. 
+For example, here is a configuration that also switches on the dashboard locally and at the same time overwrites the fact that the pull requests are now separated into major and minor.
 
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  separateMajorMinor: true,
+  dependencyDashboard: true
 
+}
+```
 
-
-### own/overwritten settings
-
-
-Read more : [Self-Hosted configuration options](https://docs.renovatebot.com/self-hosted-configuration/)
+You can read about everything that is possible in the renovate configuration, [see here](https://docs.renovatebot.com/configuration-options/)
