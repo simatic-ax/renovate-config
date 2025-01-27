@@ -1,5 +1,12 @@
 name: reusable-renovate-workflow
 
+workflow_call:
+   Input:
+     renovate_reposetory_filter:
+        description: 
+            "This fills the setting autodiscoverFilter of renovate. The name of the reprosetory from which the job was called should be written here, according to the scheme 'simatic-ax/reprosetory_name'"
+        required: true
+
 jobs:
   renovate:
     runs-on: ubuntu-24.04
@@ -24,10 +31,15 @@ jobs:
           curl -H "Authorization: Bearer $APAX_TOKEN" "https://api.simatic-ax.siemens.io/apax/login?format=npmrc" -o .npmrc
           # Store the npmrc file in the RENOVATE_NPMRC variable so that it can be used in the next step:
           {
-            echo 'RENOVATE_NPMRC<<EOF'
+            echo 'RENOVATE_NPMRC<<renovate_reposetory_filter'
+          } >> "$GITHUB_ENV"
+          # Store the value of '' in globale variable RENOVATE_AUTODISCOVERFILTER, that is used in renovate-global-config.js om next step:
+          {
+            echo 'RENOVATE_AUTODISCOVERFILTER<<EOF'
             cat .npmrc
             echo EOF
           } >> "$GITHUB_ENV"
+          # Store the 
           # Mask the contents of the npmrc file so that they don't appear in job logs:
           while read -r line;
           do

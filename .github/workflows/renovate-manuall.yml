@@ -6,3 +6,5 @@ on:
 jobs:
   manually-renovate-call:
     uses: simatic-ax/renovate-config/.github/workflows/reusable-renovate-workflow.yml
+    with:
+        renovate_reposetory_filter: "simatic-ax/ae-hw-engineering" #"simatic-ax/*"
