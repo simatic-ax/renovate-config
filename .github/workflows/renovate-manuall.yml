@@ -1,0 +1,10 @@
+name: renovate-manually-call
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  manually-renovate-call:
+    uses: simatic-ax/renovate-config/.github/workflows/reusable-renovate-workflow.yml@feat/different_renovate_trigger
+    with:
+        renovate_reposetory_filter: "simatic-ax/ae-hw-engineering" #"simatic-ax/*"
