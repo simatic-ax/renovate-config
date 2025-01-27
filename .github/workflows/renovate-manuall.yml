@@ -1,0 +1,8 @@
+name: renovate-manually-call
+
+on:
+  workflow_dispatch: 
+
+jobs:
+  manually-renovate-call:
+    uses: simatic-ax/renovate-config/.github/workflows/reusable-renovate-workflow.yml
