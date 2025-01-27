@@ -1,7 +1,7 @@
 name: reusable-renovate-workflow
 
 on:
-  workflow_call:
+  workflow_dispatch:
     inputs:
       renovate_reposetory_filter:
         description: 
