@@ -23,7 +23,7 @@ jobs:
         run: |
           apax login --registry "https://npm.pkg.github.com" --password "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: install_apax
+      - name: install_apax_and_set_variables
         shell: bash
         env:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
