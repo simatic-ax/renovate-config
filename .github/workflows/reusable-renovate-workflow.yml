@@ -31,13 +31,13 @@ jobs:
           curl -H "Authorization: Bearer $APAX_TOKEN" "https://api.simatic-ax.siemens.io/apax/login?format=npmrc" -o .npmrc
           # Store the npmrc file in the RENOVATE_NPMRC variable so that it can be used in the next step:
           {
-            echo 'RENOVATE_AUTODISCOVERFILTER<<EOF'
+            echo 'RENOVATE_NPMRC<<EOF'
             cat .npmrc
             echo EOF
           } >> "$GITHUB_ENV"
           # Store the value of '' in globale variable RENOVATE_AUTODISCOVERFILTER, that is used in renovate-global-config.js om next step:
           {      
-            echo 'RENOVATE_NPMRC<<renovate_reposetory_filter'
+            echo 'RENOVATE_AUTODISCOVERFILTER<<renovate_reposetory_filter'
           } >> "$GITHUB_ENV"
           # Store the 
           # Mask the contents of the npmrc file so that they don't appear in job logs:
