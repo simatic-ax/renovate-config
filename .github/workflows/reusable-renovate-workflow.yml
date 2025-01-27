@@ -1,12 +1,16 @@
 name: reusable-renovate-workflow
-description: 
-inputs:
-   renovate_reposetory_filter:
-     required: true
-     description: 
-        "This fills the setting autodiscoverFilter of renovate. The name of the reprosetory from which the job was called should be written here, according to the scheme 'simatic-ax/reprosetory_name'"
 
-runs:
+on:
+  workflow_call:
+    inputs:
+      renovate_reposetory_filter:
+        description: 
+          "This fills the setting autodiscoverFilter of renovate. The name of the reprosetory from which the job was called should be written here, according to the scheme 'simatic-ax/reprosetory_name'"
+        required: true
+        type: string
+
+jobs:
+  renovate:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
