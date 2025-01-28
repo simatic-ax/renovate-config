@@ -2,12 +2,12 @@ name: reusable-renovate-workflow
 
 on:
   workflow_dispatch:
-    inputs:
-      renovate_reposetory_filter:
-        description: 
-          "This fills the setting autodiscoverFilter of renovate. The name of the reprosetory from which the job was called should be written here, according to the scheme 'simatic-ax/reprosetory_name'"
-        required: true
-        type: string
+#    inputs:
+#      renovate_reposetory_filter:
+#        description: 
+#          "This fills the setting autodiscoverFilter of renovate. The name of the reprosetory from which the job was called should be written here, according to the scheme 'simatic-ax/reprosetory_name'"
+#        required: true
+#        type: string
 
 jobs:
   renovate:
@@ -40,7 +40,7 @@ jobs:
           } >> "$GITHUB_ENV"
           # Store the value of '' in globale variable RENOVATE_AUTODISCOVERFILTER, that is used in renovate-global-config.js om next step:
           {      
-            echo 'RENOVATE_AUTODISCOVERFILTER<<$RENOVATE_REPOSETORY_FILTER'
+            echo 'RENOVATE_AUTODISCOVERFILTER<<simatic-ax/ae-hw-engineering'
           } >> "$GITHUB_ENV"
           # Store the 
           # Mask the contents of the npmrc file so that they don't appear in job logs:
