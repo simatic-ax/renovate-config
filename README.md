@@ -66,16 +66,29 @@ You can read about everything that is possible in the renovate configuration, [s
 
 ## Local triggering of execution
 
+If you want to call renovate you have to create an action locally based on the Github rules. 
+Normally this is a yml file in the .github/workflows folder. More information about actions can be found in the Github documentation: [here](https://docs.github.com/en/actions)
+
+For easy use, we provide a reusable workflow that only needs to be referenced and provided with the appropriate parameters. 
+
+How this workflow can be replicated is shown in the following example configuration:
+
 ```yml
 {
+name: my-renovate-call
+
 on:
   *my_trigger*:
 
 jobs:
- *my-renovate-call*:
+ my-renovate-call:
     uses: simatic-ax/renovate-config/.github/workflows/reusable-renovate-workflow.yml@main
     secrets: inherit
     with:
         renovate_reposetory_filter: "simatic-ax/*my_repository_name*"
 }
 ```
+
+The following parameters must be supplied minimally:
+- **my_trigger**: 
+This is the condition when the workflow is executed. This can be, for example, a time or when you check in something. An overview of the events can be found: [here](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows)
