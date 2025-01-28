@@ -90,5 +90,7 @@ jobs:
 ```
 
 The following parameters must be supplied minimally:
-- **my_trigger**: 
-This is the condition when the workflow is executed. This can be, for example, a time or when you check in something. An overview of the events can be found: [here](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows)
+- **my_trigger**: This is the condition when the workflow is executed. This can be a event, like a time or when you check in something. The overview of the events can be found: [here](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows)
+- **renovate_reposetory_filter**: With these parameters you specify to the filters which repositories the renovate should check. If you want it to be local, it is the namespace **simatic-ax** and the repository name.
+
+It is also advisable to give the action a suitable name.
