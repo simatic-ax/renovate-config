@@ -1,7 +1,8 @@
 name: renovate-manually-call
 
 on:
-  workflow_dispatch: 
+  push:
+  # workflow_dispatch: 
 
 jobs:
   manually-renovate-call:
