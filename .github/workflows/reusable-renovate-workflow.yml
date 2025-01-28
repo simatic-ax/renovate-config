@@ -39,7 +39,7 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
           # Store the value of '' in globale variable RENOVATE_AUTODISCOVERFILTER, that is used in renovate-global-config.js om next step:
-          echo 'RENOVATE_AUTODISCOVERFILTER=$RENOVATE_REPOSETORY_FILTER' >> "$GITHUB_ENV"
+          echo "RENOVATE_AUTODISCOVERFILTER=$RENOVATE_REPOSETORY_FILTER" >> "$GITHUB_ENV"
           # Store the 
           # Mask the contents of the npmrc file so that they don't appear in job logs:
           while read -r line;
