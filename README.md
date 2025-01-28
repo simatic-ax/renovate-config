@@ -43,7 +43,11 @@ To activate the renovate you have to create the file **renovate.json** in the ro
 }
 ```
 
-## Local adaptation
+# Customization
+
+Of course, it is also possible to adapt the settings of the Renovate bot to your needs. For this purpose, the corresponding settings can be set in its repository - called **local**. This affects the general settings as well as the execution.
+
+## Local setting adaptation
 
 The changes that are made locally are made in the created **renovate.json**.
 
@@ -59,3 +63,19 @@ For example, here is a configuration that also switches on the dashboard locally
 ```
 
 You can read about everything that is possible in the renovate configuration, [see here](https://docs.renovatebot.com/configuration-options/)
+
+## Local triggering of execution
+
+```yml
+{
+on:
+  *my_trigger*:
+
+jobs:
+ *my-renovate-call*:
+    uses: simatic-ax/renovate-config/.github/workflows/reusable-renovate-workflow.yml@main
+    secrets: inherit
+    with:
+        renovate_reposetory_filter: "simatic-ax/*my_repository_name*"
+}
+```
