@@ -8,6 +8,9 @@ on:
           "This fills the setting autodiscoverFilter of renovate. The name of the reprosetory from which the job was called should be written here, according to the scheme 'simatic-ax/reprosetory_name'"
         required: true
         type: string
+    secrets:
+      apax_token:
+        required: true
 
 jobs:
   renovate:
@@ -19,7 +22,7 @@ jobs:
       - name: "Setup the apax runner"
         uses: simatic-ax/actions/setup-apax-runner@main
         with:
-          APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
+          APAX_TOKEN: ${{ secrets.apax_token }}
 
       - name: "Login to simatic-ax registry"
         run: |
@@ -28,10 +31,10 @@ jobs:
       - name: install_apax_and_set_variables
         shell: bash
         env:
-          APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
+          APAX_TOKEN: ${{ secrets.apax_token }}
           RENOVATE_REPOSETORY_FILTER: ${{ inputs.renovate_reposetory_filter }}
         run: |
-          curl -H "Authorization: Bearer $APAX_TOKEN" "https://api.simatic-ax.siemens.io/apax/login?format=npmrc" -o .npmrc
+          curl -H "Authorization: Bearer $apax_token" "https://api.simatic-ax.siemens.io/apax/login?format=npmrc" -o .npmrc
           # Store the npmrc file in the RENOVATE_NPMRC variable so that it can be used in the next step:
           {
             echo 'RENOVATE_NPMRC<<EOF'
