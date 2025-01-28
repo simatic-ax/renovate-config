@@ -74,7 +74,6 @@ For easy use, we provide a reusable workflow that only needs to be referenced an
 How this workflow can be replicated is shown in the following example configuration:
 
 ```yml
-{
 name: my-renovate-call
 
 on:
@@ -86,7 +85,6 @@ jobs:
     secrets: inherit
     with:
         renovate_reposetory_filter: "simatic-ax/*my_repository_name*"
-}
 ```
 
 The following parameters must be supplied minimally:
