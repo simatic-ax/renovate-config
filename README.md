@@ -26,7 +26,7 @@ A few things are preset in the general config files for clarity. These are as fo
 	- They are divided into the categories "ax", "simatic", "dockerimges" and "everything else".
 	- In each category, all dependencies of the type are displayed and all types of changes, e.g. "major" and "minor", are summarized in one pull request
 
-However, the settings can be overwritten locally; information about this can be found [here](#local-adaptation).
+However, the settings can be overwritten locally; information about this can be found [here](#local-setting-adaptation).
 
 ## Execution
 
