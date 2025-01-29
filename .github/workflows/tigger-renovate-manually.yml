@@ -1,11 +1,11 @@
-name: renovate-manually-call
+name: manual-renovate-bot-trigger
 
 on:
   workflow_dispatch:
 
 jobs:
-  manually-renovate-call:
+  manual-renovate-call:
     uses: simatic-ax/renovate-config/.github/workflows/reusable-renovate-workflow.yml@main
     secrets: inherit
     with:
-        renovate_reposetory_filter: "simatic-ax/*"
+        renovate_repository_filter: "simatic-ax/*"
