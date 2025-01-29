@@ -5,7 +5,7 @@ on:
     inputs:
       renovate_repository_filter:
         description: 
-          "This fills the setting autodiscoverFilter of renovate. The name of the reprosetory from which the job was called should be written here, according to the scheme 'simatic-ax/reprosetory_name'"
+          "This fills the setting autodiscoverFilter of renovate. The name of the repository from which the job was called should be written here, according to the scheme 'simatic-ax/repository_name'"
         required: true
         type: string
 
