@@ -9,16 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
 
-      - name: "Setup the apax runner"
-        uses: simatic-ax/actions/setup-apax-runner@main
-        with:
-          APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
-
-      - name: "Login to simatic-ax registry"
-        run: |
-          apax login --registry "https://npm.pkg.github.com" --password "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: install_apax
+      - name: extract-temporary-apax-token
         shell: bash
         env:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
