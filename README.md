@@ -36,7 +36,7 @@ Further information on how to facilitate GitHub actions and workflows can be fou
 # General structure
 
 - ./.github/workflows
-  - Contains the YML definition of both the workflows
+  - Contains the YML definition of the workflows
 - ./Global-Config
   - Contains the default presets for the Renovate bot
   - Contains a script to further configure the runtime environment of the bot
