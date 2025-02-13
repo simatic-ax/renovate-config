@@ -1,13 +1,20 @@
 # Renovate configuration
 ![main](https://docs.renovatebot.com/assets/images/mend-renovate-cli-banner.jpg)
 
-The [renovate CLI](https://docs.renovatebot.com/) can be used to automatically update dependencies in your project, once new versions of them have been released or whenever you see need.
+The [renovate CLI](https://docs.renovatebot.com/) can be used to automatically update dependencies in your project, once new versions of them have been released or whenever you see need. Please note, that every execution of the renovate bot will be carried out within the GitHub infrastructure, in case not configured otherwise.
 
 To support the user in setting up the required infrastructure, two things are being offered:
-- A workflow that automatically detects and applies updates of a dependency
+- A GitHub workflow that automatically detects and applies updates a apax dependency
   - The execution happens for all repositories within the SIMATIC AX GitHub organization
   - Schedule: Once, every Sunday
-- A workflow that enables the maintainer of a repository to manually trigger the detection and application of dependency updates
+- A GitHub workflow that enables the maintainer of a repository to manually trigger the detection and application of dependency updates.
+
+## Types of dependencies
+
+The current configuration allows to detect an update with respect to the following types of dependencies:
+- SIMATIC AX dependencies
+  - dependencies
+  - devDependencies
 
 Once the Renovate bot discovered newly available versions of a dependency, it'll automatically set up a pull request wherein the updates have been applied. This supports the user in deciding if and when to update dependencies of a project.
 
@@ -19,19 +26,22 @@ The Renovate workflow defined inside this repository can be reused inside workfl
 name: my-renovate-call
 
 on:
-  *my_trigger*:
+  schedule:
+    # schedules the action to be executed on the 1st of every month
+    - cron: '* * 1 * 1'
 
 jobs:
  my-renovate-call:
     uses: simatic-ax/renovate-config/.github/workflows/reusable-renovate-workflow.yml@main
     secrets: inherit
     with:
-        renovate_reposetory_filter: "simatic-ax/*my_repository_name*"
+        renovate_repository_filter: "simatic-ax/<my_repository_name>"
 ```
 
-This will configure a GitHub workflow, named my-renovate-call whose job simply references and executes the workflow provided by **THIS** repository to run the Renovate bot inside a CI pipeline of your own repository.
+This will configure a GitHub workflow, named "my-renovate-call" whose job simply references and executes the workflow provided by **THIS** repository to run the Renovate bot inside a CI pipeline of your own repository.
 
-Further information on how to facilitate GitHub actions and workflows can be found [here](https://docs.github.com/en/actions).
+Further information on how to facilitate GitHub actions and workflows can be found [here](https://docs.github.com/en/actions). 
+Information regarding the usage of triggers can be found [here](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs).
 
 # General structure
 
@@ -56,9 +66,11 @@ The automatic execution of the Renovate bot includes the following major steps:
 
 ### Manual execution
 
-The manual execution does the exact same thing, except it offers a button to the user to run the Renovate bot manually whenever required.
+The manual execution does the exact same thing, except it offers a button to the user to run the Renovate bot manually whenever required. To execute a GitHub action manually, simply navigate to the "Actions" tab within your repository, pick the action of the left side and execute "Run workflow".
 
 ## Renovate configuration
+
+**DISCLAIMER**: We don't expect you to actively alter the provided configuration, since it has been configured already to support the most common usecases when using SIMATIC AX. However, following you'll find a more technical description of what could be configured additionally. In case you don't plan any customization or are not in need of setting up a renovate bot for own, feel free to skip this part. 
 
 ### Entry point
 
@@ -86,9 +98,9 @@ For more detailed information regarding the configuration, see the [official ren
 One may either simply use the existing configuration, or extend it wherever necessary. In case you require additional parameterization of the Renovate bot, or in case you'd like to override an existing setting, adapt the [renovate.json](./renovate.json) inside your own repository. Once done, the set of settings to configure the bot will be an aggregation of the globally defined [renovate-global-config.js](./Global-Config/renovate-global-config.js) and the renovate.json file inside the respective repository.
 
 The following example of a renovate.json configuration will:
+  - overwrites the handling of minor and major version while updating
   - extend the global configuration, such that a dashboard will be shown inside the update pull request
-  - overwrites the handling of minor and major version while updating.
-
+  
 ```json
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
