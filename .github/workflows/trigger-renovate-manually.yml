@@ -5,7 +5,7 @@ on:
 
 jobs:
   manual-renovate-call:
-    uses: simatic-ax/renovate-config/.github/workflows/trigger-renovate-automatically.yml@main
+    uses: simatic-ax/renovate-config/.github/workflows/renovate-bot-run.yml@main
     secrets: inherit
     with:
         renovate_repository_filter: "simatic-ax/*"
