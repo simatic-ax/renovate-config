@@ -108,7 +108,13 @@ module.exports = {
       "matchPackagePatterns": ["^@{0,1}[Aa][Xx]"],
       "groupName": "AX Product Dependencies",
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
-    },
+      },
+      {
+          // splite SDK out that it doesn't follow the rules regarding breaking changes and version number assignment
+          "matchPackagePatterns": ["^@{0,1}[Aa][Xx]/[Ss][Dd][Kk]"],
+          "groupName": "AX Product SDK",
+          "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
+      },
     {
     // ax simatic dependencies separated because of breaking changes
       "matchPackagePatterns": ["^@{0,1}[Ss][Ii][Mm][Aa][Tt][Ii][Cc]-[Aa][Xx]"],
