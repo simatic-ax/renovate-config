@@ -1,4 +1,4 @@
-name: automatic-renovate-bot-trigger
+name: renovate-bot-run
 
 on:
   workflow_call:
