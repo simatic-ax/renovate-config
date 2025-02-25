@@ -77,28 +77,6 @@ module.exports = {
         fileFilters: ["**/apax-lock.json"],
           },
       },
-      {
-          // Ensure lock files are updated
-          matchPaths: ["**/apax.y{a,}ml"],
-          postUpgradeTasks: {
-              // Switch to the directory of the apax.yml and update the lock file if it exists.
-              commands: [
-                  `
-          cd "./{{{packageFileDir}}}" && 
-          if test -f apax-lock.json; then 
-            if apax install --ignore-scripts; then
-              echo Failed to update lock file.
-            else
-              echo Successfully updated lock file.
-            fi
-          else
-            echo No lock file to update.
-          fi
-        `,
-              ],
-              fileFilters: ["**/apax-lock.json"],
-          },
-      },
     {
       "matchDatasources": ["docker"],
       "groupName": "all container images",
