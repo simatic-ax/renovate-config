@@ -62,6 +62,7 @@ module.exports = {
         // Switch to the directory of the apax.yml and update the lock file if it exists.
         commands: [
           `
+          echo The value of package dir is: {{{packageFileDir}}}
           cd ./{{{packageFileDir}}} && 
           if test -f apax-lock.json; then 
             if apax install; then
