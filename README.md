@@ -100,26 +100,3 @@ The following example of a renovate.json configuration will:
 Further information on what and how to configure can be found [here](https://docs.renovatebot.com/configuration-options/)
 
 Note, that every single property of the global configuration could be altered this way, in case required.
-
-### Local execution
-
-In order to be able to test and debug renovate, it is recommended to run the renovate locally.
-Here is a short, bullet-point guide. More and more in-depth information can also be found on the corresponding renovate page [here](https://docs.renovatebot.com/examples/self-hosting/).
-
-It is best to install renovate globally on your PC. You can do this with the following command in your terminal / bash:
-
-```bash
-{
-    npm install -g renovate
-}
-```
-
-https://docs.renovatebot.com/modules/platform/local/
-
-```bash
-{
-    renovate --platform=local --dry-run=full --config /Global-Config/renovate-global-config.js
-}
-```
-
---require-config "D:\Git\renovate-config\Global-Config\renovate-global-config.js"
