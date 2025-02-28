@@ -60,5 +60,6 @@ jobs:
           docker-user: root
           configurationFile: Global-Config/renovate-global-config.js
           token: ${{ secrets.RENOVATE_TOKEN }}
+          renovate-image: ghcr.io/simatic-ax/ci-images/apax-ci-image:3.4.2
         env:
           LOG_LEVEL: debug
