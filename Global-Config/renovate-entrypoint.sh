@@ -1,4 +1,5 @@
 #!/bin/bash
+set -ex
 sudo apt-get install --assume-yes --no-install-recommends \
         libtinfo6 \
         git 
@@ -7,6 +8,8 @@ sudo npm config set prefix "~/.local/"
 sudo mkdir -p ~/.local/bin
 sudo echo 'export PATH=~/.local/bin/:$PATH' >>~/.bashrc
 sudo npm init -y
+curl -f -H "Authorization: bearer $RENOVATE_APAX_TOKEN" \
+        https://api.simatic-ax.siemens.io/apax/login?format=npmrc > .npmrc \
 sudo npm add @ax/apax-signed
 sudo npm install
 cd node_modules/@ax/apax-signed
@@ -31,4 +34,5 @@ echo "WwIDAQAB" \
 echo "-----END PUBLIC KEY-----" \
 >>public.pem
 npm install --global ax-apax-*.tgz --verbose
+apax --version
 runuser -u ubuntu renovate
