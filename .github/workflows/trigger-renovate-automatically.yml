@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
+        with:
+            ref: ${{ github.ref }}
 
       - name: set_variables
         shell: bash
@@ -53,4 +55,4 @@ jobs:
           docker-user: root
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
-            LOG_LEVEL: 'trace'
+            LOG_LEVEL: 'debug'
