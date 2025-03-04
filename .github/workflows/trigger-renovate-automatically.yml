@@ -53,4 +53,4 @@ jobs:
           docker-user: root
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
-            LOG_LEVEL: 'debug'
+            LOG_LEVEL: 'trace'
