@@ -5,7 +5,7 @@ on:
 
 jobs:
   manual-renovate-call:
-    uses: simatic-ax/renovate-config/.github/workflows/trigger-renovate-automatically.yml@chore/update_apax_lock
+    uses: ./.github/workflows/trigger-renovate-automatically.yml
     secrets: inherit
     with:
         renovate_repository_filter: "simatic-ax/ae-trafficlight"
