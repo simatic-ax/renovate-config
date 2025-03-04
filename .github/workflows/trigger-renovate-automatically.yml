@@ -52,3 +52,5 @@ jobs:
           docker-cmd-file: Global-Config/renovate-entrypoint.sh
           docker-user: root
           token: ${{ secrets.RENOVATE_TOKEN }}
+        env:
+            LOG_LEVEL: 'debug'
