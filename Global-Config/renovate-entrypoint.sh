@@ -1,5 +1,6 @@
 #!/bin/bash
 set -ex
+echo "Hallo es ist völlig Wurst"
 sudo apt-get install --assume-yes --no-install-recommends \
         libtinfo6 \
         git 
