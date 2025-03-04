@@ -12,19 +12,10 @@ on:
 jobs:
   renovate:
     runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/simatic-ax/ci-images/apax-ci-image:3.4.2
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.1
-
-      - name: "Login to simatic-ax registry"
-        run: |
-          apax login --registry "https://npm.pkg.github.com" --password "${{ secrets.GITHUB_TOKEN }}"
 
       - name: install_apax_and_set_variables
         shell: bash
