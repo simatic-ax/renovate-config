@@ -49,7 +49,7 @@ jobs:
         uses: renovatebot/github-action@v41.0.14
         with:
           configurationFile: Global-Config/renovate-global-config.js
-          docker-cmd-file: Global-Config/renovate-entrypoint.sh
+          docker-cmd-file: Global-Config/my-entrypoint.sh
           docker-user: root
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
