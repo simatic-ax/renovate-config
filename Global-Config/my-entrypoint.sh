@@ -36,4 +36,4 @@ echo "Hallo es ist völlig Wurst"
 #>>public.pem
 #npm install --global ax-apax-*.tgz --verbose
 #apax --version
-runuser -u ubuntu renovate
+# runuser -u ubuntu renovate

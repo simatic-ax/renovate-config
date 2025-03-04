@@ -12,6 +12,7 @@ on:
 jobs:
   renovate:
     runs-on: ubuntu-24.04
+    container: ghcr.io/renovatebot/renovate:39.185.7
 
     steps:
       - name: Checkout
@@ -46,13 +47,27 @@ jobs:
             echo "Error: .npmrc file not found" >&2
             exit 1
           fi
+      - name: install_apax
+        run: Global-Config\my-entrypoint.sh
 
       - name: Self-hosted Renovate
-        uses: renovatebot/github-action@v41.0.14
-        with:
-          configurationFile: Global-Config/renovate-global-config.js
-          docker-cmd-file: Global-Config/my-entrypoint.sh
-          docker-user: root
-          token: ${{ secrets.RENOVATE_TOKEN }}
+        run: renovate
         env:
-            LOG_LEVEL: 'debug'
+          RENOVATE_CONFIG_FILE: "Global-Config/renovate-global-config.js"
+          LOG_LEVEL: "debug"
+          # RENOVATE_CONFIG_MIGRATION: "true" # ensure all repositories receive config migration PRs
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+          # GITHUB_COM_TOKEN: ${{ secrets.GH_TOKEN }}
+          # HUB_DOCKER_COM_USER: ${{ secrets.HUB_DOCKER_COM_USER }}
+          # HUB_DOCKER_COM_TOKEN: ${{ secrets.HUB_DOCKER_COM_TOKEN }}
+  
+
+
+      #  uses: renovatebot/github-action@v41.0.14
+      #  with:
+      #    configurationFile: Global-Config/renovate-global-config.js
+      #    docker-cmd-file: Global-Config/my-entrypoint.sh
+      #    docker-user: root
+      #    token: ${{ secrets.RENOVATE_TOKEN }}
+      #  env:
+      #      LOG_LEVEL: 'debug'
