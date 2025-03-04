@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.1
 
-      - name: install_apax_and_set_variables
+      - name: set_variables
         shell: bash
         env:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
