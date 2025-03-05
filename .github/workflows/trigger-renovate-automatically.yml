@@ -51,7 +51,8 @@ jobs:
             exit 1
           fi
       - name: install_apax
-        run: Global-Config\my-entrypoint.sh
+        run: |
+          chmod +x /Global-Config/my-entrypoint.sh
 
       - name: Self-hosted Renovate
         run: renovate
