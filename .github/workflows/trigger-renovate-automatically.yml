@@ -22,7 +22,6 @@ jobs:
         with:
             ref: ${{ github.ref }}
             
-
       - name: set_variables
         shell: bash
         env:
@@ -52,6 +51,12 @@ jobs:
           fi
       - name: install_apax
         run: |
+          # Change to the project directory
+          cd ${{ inputs.path }}
+
+          echo "print ls"
+          ls
+
           chmod +x /Global-Config/my-entrypoint.sh
 
       - name: Self-hosted Renovate
