@@ -20,7 +20,8 @@ jobs:
         with:
             ref: ${{ github.ref }}
             options: --user root
-
+            clean: false
+            set-safe-directory: false
       - name: set_variables
         shell: bash
         env:
