@@ -54,8 +54,8 @@ jobs:
           # Change to the project directory
           cd ${{ inputs.path }}
 
-          echo "print ls"
-          ls
+          echo 'print ls'
+          ls -la 
 
           chmod +x /Global-Config/my-entrypoint.sh
 
