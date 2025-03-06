@@ -54,8 +54,10 @@ jobs:
           # Change to the project directory
           echo 'Show the contents of the repose story to the runner:'
           ls -la 
+          cd Global-Config
+          ls -la 
           echo 'Call install apax bash script'
-          chmod +x /Global-Config/install-apax.sh
+          install-apax.sh
 
       - name: Self-hosted Renovate
         run: renovate
