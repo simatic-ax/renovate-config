@@ -52,12 +52,12 @@ jobs:
       - name: install_apax
         run: |
           # Change to the project directory
-          cd ${{ github.workspace }}
-          echo ${{ github.workspace }}
           echo 'print ls'
           ls -la 
-
-          chmod +x /Global-Config/my-entrypoint.sh
+          echo 'print ls 2'
+          cd ..
+          ls -la 
+          chmod +x ${{ github.workspace }}/Global-Config/my-entrypoint.sh
 
       - name: Self-hosted Renovate
         run: renovate
