@@ -5,7 +5,7 @@ apt-get install --assume-yes --no-install-recommends \
         git
 mkdir apax-dep
 curl -sL https://deb.nodesource.com/setup_14.x 
-apt install nodejs
+apt install npm
 npm config set prefix "~/.local/"
 mkdir -p ~/.local/bin
 echo 'export PATH=~/.local/bin/:$PATH' >>~/.bashrc
