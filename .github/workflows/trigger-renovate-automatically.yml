@@ -57,7 +57,8 @@ jobs:
           cd Global-Config
           ls -la 
           echo 'Call install apax bash script'
-          install-apax.sh
+          chmod +x ./install-apax.sh
+          ./install-apax.sh
 
       - name: Self-hosted Renovate
         run: renovate
