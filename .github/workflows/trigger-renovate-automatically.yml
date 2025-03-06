@@ -52,8 +52,9 @@ jobs:
       - name: install_apax
         run: |
           # Change to the project directory
-          cd ${{ inputs.path }}
-
+          cd ${{ GITHUB_WORKSPACE }}
+          $ echo $GITHUB_WORKSPACE
+          $ echo ${{ github.workspace }}
           echo 'print ls'
           ls -la 
 
