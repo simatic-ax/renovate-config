@@ -2,9 +2,9 @@
 set -ex
 apt-get install --assume-yes --no-install-recommends \
         libtinfo6 \
-        git 
+        git \
+        nodejs
 mkdir apax-dep
-apt install npm
 npm config set prefix "~/.local/"
 mkdir -p ~/.local/bin
 echo 'export PATH=~/.local/bin/:$PATH' >>~/.bashrc
