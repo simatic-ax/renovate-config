@@ -2,17 +2,16 @@
 set -ex
 apt-get install --assume-yes --no-install-recommends \
         libtinfo6 \
-        git \
-        nodejs
+        git
 mkdir apax-dep
-npm config set prefix "~/.local/"
+nvm config set prefix "~/.local/"
 mkdir -p ~/.local/bin
 echo 'export PATH=~/.local/bin/:$PATH' >>~/.bashrc
-npm init -y
+nvm init -y
 curl -f -H "Authorization: bearer $RENOVATE_APAX_TOKEN" \
         https://api.simatic-ax.siemens.io/apax/login?format=npmrc > .npmrc \
-npm add @ax/apax-signed
-npm install
+nvm add @ax/apax-signed
+nvm install
 cd node_modules/@ax/apax-signed
 ls -al
 chmod 777 .
@@ -34,6 +33,6 @@ echo "WwIDAQAB" \
 >>public.pem
 echo "-----END PUBLIC KEY-----" \
 >>public.pem
-npm install --global ax-apax-*.tgz --verbose
+nvm install --global ax-apax-*.tgz --verbose
 apax --version
 #runuser -u ubuntu renovate
