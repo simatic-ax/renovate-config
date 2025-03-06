@@ -52,12 +52,10 @@ jobs:
       - name: install_apax
         run: |
           # Change to the project directory
-          echo 'print ls'
+          echo 'Show the contents of the repose story to the runner:'
           ls -la 
-          echo 'print ls 2'
-          cd ..
-          ls -la 
-          chmod +x ${{ github.workspace }}/Global-Config/my-entrypoint.sh
+          echo 'Call install apax bash script'
+          chmod +x /Global-Config/install-apax.sh
 
       - name: Self-hosted Renovate
         run: renovate
