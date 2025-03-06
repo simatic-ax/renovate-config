@@ -4,7 +4,7 @@ apt-get install --assume-yes --no-install-recommends \
         libtinfo6 \
         git
 mkdir apax-dep
-curl -sL https://deb.nodesource.com/setup_14.x | -E bash -
+curl -sL https://deb.nodesource.com/setup_14.x 
 apt install nodejs
 npm config set prefix "~/.local/"
 mkdir -p ~/.local/bin
