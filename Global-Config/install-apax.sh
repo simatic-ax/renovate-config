@@ -4,14 +4,16 @@ apt-get install --assume-yes --no-install-recommends \
         libtinfo6 \
         git
 mkdir apax-dep
-nvm config set prefix "~/.local/"
+curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+apt install nodejs
+npm config set prefix "~/.local/"
 mkdir -p ~/.local/bin
 echo 'export PATH=~/.local/bin/:$PATH' >>~/.bashrc
-nvm init -y
+npm init -y
 curl -f -H "Authorization: bearer $RENOVATE_APAX_TOKEN" \
         https://api.simatic-ax.siemens.io/apax/login?format=npmrc > .npmrc \
-nvm add @ax/apax-signed
-nvm install
+npm add @ax/apax-signed
+npm install
 cd node_modules/@ax/apax-signed
 ls -al
 chmod 777 .
@@ -33,6 +35,6 @@ echo "WwIDAQAB" \
 >>public.pem
 echo "-----END PUBLIC KEY-----" \
 >>public.pem
-nvm install --global ax-apax-*.tgz --verbose
+npm install --global ax-apax-*.tgz --verbose
 apax --version
 #runuser -u ubuntu renovate
