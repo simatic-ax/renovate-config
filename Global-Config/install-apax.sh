@@ -1,11 +1,13 @@
 #!/bin/bash
 set -ex
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+
 apt-get install --assume-yes --no-install-recommends \
         libtinfo6 \
-        git
+        nodejs
 mkdir apax-dep
-curl -sL https://deb.nodesource.com/setup_14.x 
-apt install npm
+
+# apt install npm
 npm config set prefix "~/.local/"
 mkdir -p ~/.local/bin
 echo 'export PATH=~/.local/bin/:$PATH' >>~/.bashrc
