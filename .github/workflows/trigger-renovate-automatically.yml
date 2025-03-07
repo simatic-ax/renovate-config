@@ -12,12 +12,17 @@ on:
 jobs:
   renovate:
     runs-on: ubuntu-24.04
+    container: 
+        image: ghcr.io/renovatebot/renovate:37.440
+        options: --user root
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.1
-
-      - name: install_apax_and_set_variables
+        uses: actions/checkout@v4
+        with:
+            ref: ${{ github.ref }}
+            
+      - name: set_variables
         shell: bash
         env:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
@@ -45,12 +50,37 @@ jobs:
             exit 1
           fi
 
-      - name: Self-hosted Renovate
-        uses: renovatebot/github-action@v39.1.1
-        with:
-          docker-cmd-file: Global-Config/renovate-entrypoint.sh
-          docker-user: root
-          configurationFile: Global-Config/renovate-global-config.js
-          token: ${{ secrets.RENOVATE_TOKEN }}
+      - name: install_apax
+        # In a further step, you can check whether this step can be replaced by an install job from the action repro
+        shell: bash
         env:
-          LOG_LEVEL: debug
+          APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
+        run: |
+          echo 'Contents of the repository:'
+          ls -la 
+          echo 'Set execute permission for bash script'
+          chmod +x ./Global-Config/install-apax.sh
+          echo 'Call install apax bash script'
+          ./Global-Config/install-apax.sh
+          echo 'Install apax bash script is finished'
+      
+      - name: login to registries
+        # In a further step, the job can be exchanged for the login job from action repro
+        shell: bash
+        env:
+          APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo 'Login to AX prod registry'
+          apax login --password $APAX_TOKEN 
+          echo 'Login to github npm registry'
+          apax login --registry "https://npm.pkg.github.com/" --password "$GITHUB_TOKEN"
+  
+
+      - name: Self-hosted Renovate
+        shell: bash
+        run: renovate
+        env:
+          RENOVATE_CONFIG_FILE: "Global-Config/renovate-global-config.js"
+          LOG_LEVEL: "debug"
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
