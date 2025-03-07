@@ -49,11 +49,11 @@ jobs:
             echo "Error: .npmrc file not found" >&2
             exit 1
           fi
+
       - name: install_apax
         env:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
         run: |
-          Change to the project directory
           echo 'Show the contents of the repose story to the runner:'
           ls -la 
           echo 'Set execute permission for bash script'
