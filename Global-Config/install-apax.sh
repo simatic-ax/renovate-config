@@ -17,7 +17,6 @@ echo "5y+ecHh0wom+diN3RdSDk5TqKl9F8lThAqd8LjFxRcjaeaKftruTB9yd+ppN/4wl" >> publi
 echo "avwaTQ/7eYHbvNV5aYeELUzxFykhsqKlIeo93y/ncnU0xS7W6ccCvNJ74kRfRtJY" >> public.pem 
 echo "WwIDAQAB" >> public.pem
 echo "-----END PUBLIC KEY-----" >> public.pem
-cat public.pem
 echo "Print directory content"
 ls -la
 openssl dgst -sha256 -verify public.pem -signature ax-apax.sig ax-apax-*.tgz
