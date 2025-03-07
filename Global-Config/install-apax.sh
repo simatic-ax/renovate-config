@@ -31,5 +31,8 @@ npm install -g ax-apax-*.tgz
 echo "give me npm list -g"
 npm list -g
 echo "$PATH"
+export PATH="/github/home/.local/lib:$PATH"
+echo "new path"
+echo "$PATH"
 apax --version
 #runuser -u ubuntu renovate
