@@ -18,7 +18,6 @@ module.exports = {
   allowScripts: true,
   exposeAllEnv: true,
   ignoreScripts: true,
-  prHourlyLimit: 43,
   npmrc: process.env.RENOVATE_NPMRC,
   labels: ["renovate"],
   hostRules: [
