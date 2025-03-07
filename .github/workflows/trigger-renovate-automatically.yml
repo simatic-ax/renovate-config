@@ -51,6 +51,7 @@ jobs:
           fi
 
       - name: install_apax
+        # In a further step, you can check whether this step can be replaced by an install job from the action repro
         shell: bash
         env:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
@@ -64,6 +65,8 @@ jobs:
           echo 'Install apax bash script is finished'
       
       - name: login to registries
+        # In a further step, the job can be exchanged for the login job from action repro
+        shell: bash
         env:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -80,19 +83,4 @@ jobs:
         env:
           RENOVATE_CONFIG_FILE: "Global-Config/renovate-global-config.js"
           LOG_LEVEL: "debug"
-          # RENOVATE_CONFIG_MIGRATION: "true" # ensure all repositories receive config migration PRs
           RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
-          # GITHUB_COM_TOKEN: ${{ secrets.GH_TOKEN }}
-          # HUB_DOCKER_COM_USER: ${{ secrets.HUB_DOCKER_COM_USER }}
-          # HUB_DOCKER_COM_TOKEN: ${{ secrets.HUB_DOCKER_COM_TOKEN }}
-  
-
-
-      #  uses: renovatebot/github-action@v41.0.14
-      #  with:
-      #    configurationFile: Global-Config/renovate-global-config.js
-      #    docker-cmd-file: Global-Config/my-entrypoint.sh
-      #    docker-user: root
-      #    token: ${{ secrets.RENOVATE_TOKEN }}
-      #  env:
-      #      LOG_LEVEL: 'debug'
