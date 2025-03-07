@@ -24,6 +24,8 @@ echo "avwaTQ/7eYHbvNV5aYeELUzxFykhsqKlIeo93y/ncnU0xS7W6ccCvNJ74kRfRtJY" >> publi
 echo "WwIDAQAB" >> public.pem
 echo "-----END PUBLIC KEY-----" >> public.pem
 cat public.pem
+echo "Print directory content"
+ls -la
 openssl dgst -sha256 -verify public.pem -signature ax-apax.sig ax-apax-*.tgz
 npm install -g ax-apax-*.tgz
 echo "$PATH"
