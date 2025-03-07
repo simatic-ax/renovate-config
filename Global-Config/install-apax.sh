@@ -1,9 +1,9 @@
 #!/bin/bash
 set -ex
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-
-apt-get install --assume-yes --no-install-recommends libtinfo6 nodejs
-mkdir apax-dep
+apt-get install -y nodejs
+#apt-get install --assume-yes --no-install-recommends libtinfo6 nodejs
+#mkdir apax-dep
 
 # apt install npm
 npm config set prefix "~/.local/"
