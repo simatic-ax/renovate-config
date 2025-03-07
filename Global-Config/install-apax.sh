@@ -28,6 +28,8 @@ echo "Print directory content"
 ls -la
 openssl dgst -sha256 -verify public.pem -signature ax-apax.sig ax-apax-*.tgz
 npm install -g ax-apax-*.tgz
+echo "give me npm list -g"
+npm list -g
 echo "$PATH"
 apax --version
 #runuser -u ubuntu renovate
