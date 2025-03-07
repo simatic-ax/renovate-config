@@ -23,7 +23,7 @@ on:
 
 jobs:
  my-renovate-call:
-    uses: simatic-ax/renovate-config/.github/workflows/reusable-renovate-workflow.yml@main
+    uses: ./.github/workflows/renovate-bot-run.yml
     secrets: inherit
     with:
         renovate_reposetory_filter: "simatic-ax/*my_repository_name*"
