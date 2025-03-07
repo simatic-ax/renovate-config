@@ -62,6 +62,8 @@ jobs:
           echo 'Call install apax bash script'
           ./Global-Config/install-apax.sh
           echo 'Install apax bash script is finished'
+          echo 'Login into Apax'
+          apax login --password $APAX_TOKEN 
 
       - name: Self-hosted Renovate
         shell: bash
