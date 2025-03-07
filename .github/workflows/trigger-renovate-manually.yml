@@ -8,4 +8,4 @@ jobs:
     uses: ./.github/workflows/trigger-renovate-automatically.yml
     secrets: inherit
     with:
-        renovate_repository_filter: "simatic-ax/ae-trafficlight"
+        renovate_repository_filter: "simatic-ax/*"
