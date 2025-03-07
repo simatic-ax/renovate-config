@@ -1,6 +1,6 @@
 #!/bin/bash
 set -ex
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 
 apt-get install --assume-yes --no-install-recommends libtinfo6 nodejs
 mkdir apax-dep
@@ -31,7 +31,12 @@ npm install -g ax-apax-*.tgz
 echo "give me npm list -g"
 npm list -g
 echo "$PATH"
-PATH="$PATH:/github/home/.local/lib"
+if echo "$PATH" | grep 'foo'; then
+  echo "Nothing add to Path"
+else
+  PATH="$PATH:/github/home/.local/lib"
+  echo "It's there!"
+fi
 echo "new path"
 echo "$PATH"
 apax --version

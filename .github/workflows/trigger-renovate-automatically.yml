@@ -51,6 +51,7 @@ jobs:
           fi
 
       - name: install_apax
+        shell: bash
         env:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
         run: |
@@ -63,6 +64,7 @@ jobs:
           echo 'Install apax bash script is finished'
 
       - name: Self-hosted Renovate
+        shell: bash
         run: renovate
         env:
           RENOVATE_CONFIG_FILE: "Global-Config/renovate-global-config.js"
