@@ -12,8 +12,7 @@ npm config set prefix "~/.local/"
 mkdir -p ~/.local/bin
 echo 'export PATH=~/.local/bin/:$PATH' >>~/.bashrc
 npm init -y
-curl -f -H "Authorization: bearer $APAX_TOKEN" \
-        https://api.simatic-ax.siemens.io/apax/login?format=npmrc > .npmrc \
+curl -f -H "Authorization: bearer $APAX_TOKEN" https://api.simatic-ax.siemens.io/apax/login?format=npmrc > .npmrc \
 npm add @ax/apax-signed
 npm install
 cd node_modules/@ax/apax-signed
