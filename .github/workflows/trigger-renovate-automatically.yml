@@ -73,7 +73,7 @@ jobs:
         run: |
           echo 'Login to AX prod registry'
           apax login --password $APAX_TOKEN 
-          echo 'Login to github'
+          echo 'Login to github npm registry'
           apax login --registry "https://npm.pkg.github.com/" --password "$GITHUB_TOKEN"
   
 
