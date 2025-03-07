@@ -1,14 +1,15 @@
 #!/bin/bash
 set -ex
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-apt-get install -y nodejs
+#curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+#apt-get install -y nodejs
 #apt-get install --assume-yes --no-install-recommends libtinfo6 nodejs
-#mkdir apax-dep
-
+mkdir apax-dep
+cd apax-dep
+echo "Apax-dep directory create and change to there"
 # apt install npm
-npm config set prefix "~/.local/"
-mkdir -p ~/.local/bin
-echo 'export PATH=~/.local/bin/:$PATH' >>~/.bashrc
+#npm config set prefix "~/.local/"
+#mkdir -p ~/.local/bin
+#echo 'export PATH=~/.local/bin/:$PATH' >>~/.bashrc
 npm init -y
 curl -f -H "Authorization: bearer $APAX_TOKEN" https://api.simatic-ax.siemens.io/apax/login?format=npmrc > .npmrc 
 npm add @ax/apax-signed
@@ -30,14 +31,14 @@ openssl dgst -sha256 -verify public.pem -signature ax-apax.sig ax-apax-*.tgz
 npm install -g ax-apax-*.tgz
 echo "give me npm list -g"
 npm list -g
-echo "$PATH"
-if echo "$PATH" | grep 'foo'; then
-  echo "Nothing add to Path"
-else
-  PATH="$PATH:/github/home/.local/lib"
-  echo "It's there!"
-fi
-echo "new path"
-echo "$PATH"
+#echo "$PATH"
+#if echo "$PATH" | grep 'foo'; then
+#  echo "Nothing add to Path"
+#else
+#  PATH="$PATH:/github/home/.local/lib"
+#  echo "It's there!"
+#fi
+#echo "new path"
+#echo "$PATH"
 apax --version
 #runuser -u ubuntu renovate
