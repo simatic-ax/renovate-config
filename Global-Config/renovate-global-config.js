@@ -62,21 +62,21 @@ module.exports = {
         // Switch to the directory of the apax.yml and update the lock file if it exists.
         commands: [
           `
-          cd ./{{{packageFileDir}}} && 
-          if test -f apax-lock.json; then 
+          cd ./{{{packageFileDir}}} &&
+          if test -f apax-lock.json; then
             if apax install; then
-              echo Successfully updated lock file.
+              echo 'Successfully updated lock file.'
             else
-              echo Failed to update lock file.
+              echo 'Failed to update lock file.'
             fi
           else
-            echo No lock file to update.
+            echo 'No lock file to update.'
           fi
         `,
         ],
         fileFilters: ["**/apax-lock.json"],
+          },
       },
-    },
     {
       "matchDatasources": ["docker"],
       "groupName": "all container images",
@@ -84,14 +84,20 @@ module.exports = {
     },
     {
       "matchPackagePatterns": ["^@{0,1}[Aa][Xx]"],
-      "groupName": "AX Product Dependencies",
+      "groupName": "AX-Product dependencies",
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
-    },
+      },
+      {
+          // splite SDK out that it doesn't follow the rules regarding breaking changes and version number assignment
+          "matchPackagePatterns": ["^@{0,1}[Aa][Xx]/[Ss][Dd][Kk]"],
+          "groupName": "AX-Product SDK",
+          "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
+      },
     {
     // ax simatic dependencies separated because of breaking changes
       "matchPackagePatterns": ["^@{0,1}[Ss][Ii][Mm][Aa][Tt][Ii][Cc]-[Aa][Xx]"],
-      "groupName": "AX Github Comunity",
+      "groupName": "AX Github Community dependencies",
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
     }
-  ]
+    ],
 };
