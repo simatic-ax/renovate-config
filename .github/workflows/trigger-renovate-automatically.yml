@@ -62,8 +62,17 @@ jobs:
           echo 'Call install apax bash script'
           ./Global-Config/install-apax.sh
           echo 'Install apax bash script is finished'
-          echo 'Login into Apax'
+      
+      - name: login to registries
+        env:
+          APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo 'Login to prod'
           apax login --password $APAX_TOKEN 
+          echo 'Login to github'
+          apax login --registry "https://npm.pkg.github.com/" --password "$GITHUB_TOKEN"
+  
 
       - name: Self-hosted Renovate
         shell: bash
