@@ -84,13 +84,13 @@ module.exports = {
     },
     {
       "matchPackagePatterns": ["^@{0,1}[Aa][Xx]"],
-      "groupName": "AX Product Dependencies_V3",
+      "groupName": "AX Product Dependencies_V4",
       "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
       },
       {
           // splite SDK out that it doesn't follow the rules regarding breaking changes and version number assignment
           "matchPackagePatterns": ["^@{0,1}[Aa][Xx]/[Ss][Dd][Kk]"],
-          "groupName": "AX Product SDK_V3",
+          "groupName": "AX Product SDK_V4",
           "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
       },
     {
