@@ -14,7 +14,7 @@ on: #        ? ? ? ? ?
     - cron: "1 0 * * 0"  # Every Sunday at 0:01
 
 jobs:
-  manual-renovate-call:
+  weekly-renovate-call:
     uses: ./.github/workflows/renovate-bot-run.yml
     secrets: inherit
     with:
