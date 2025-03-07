@@ -56,7 +56,7 @@ jobs:
         env:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
         run: |
-          echo 'Show the contents of the repose story to the runner:'
+          echo 'Contents of the repository:'
           ls -la 
           echo 'Set execute permission for bash script'
           chmod +x ./Global-Config/install-apax.sh
