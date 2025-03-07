@@ -26,5 +26,6 @@ echo "-----END PUBLIC KEY-----" >> public.pem
 cat public.pem
 openssl dgst -sha256 -verify public.pem -signature ax-apax.sig ax-apax-*.tgz
 npm install -g ax-apax-*.tgz
+echo "$PATH"
 apax --version
 #runuser -u ubuntu renovate
