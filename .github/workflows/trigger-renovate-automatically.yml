@@ -28,6 +28,7 @@ jobs:
           APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
           RENOVATE_REPOSITORY_FILTER: ${{ inputs.renovate_repository_filter }}
         run: |
+          echo "$APAX_TOKEN"
           curl -H "Authorization: Bearer $APAX_TOKEN" "https://api.simatic-ax.siemens.io/apax/login?format=npmrc" -o .npmrc
           # Store the npmrc file in the RENOVATE_NPMRC variable so that it can be used in the next step:
           {
