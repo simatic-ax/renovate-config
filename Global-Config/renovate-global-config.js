@@ -28,7 +28,7 @@ module.exports = {
     },
     {
       hostType: "npm",
-      matchHost: "registry.simatic-ax.siemens.io",
+      matchHost: "https://npm.pkg.github.com/",
       token: process.env.GITHUB_TOKEN,
     },
   ],
