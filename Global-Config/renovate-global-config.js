@@ -24,7 +24,12 @@ module.exports = {
     {
       hostType: "npm",
       matchHost: "registry.simatic-ax.siemens.io",
-      token: process.env.RENOVATE_APAX_TOKEN,
+      token: process.env.APAX_TOKEN,
+    },
+    {
+      hostType: "npm",
+      matchHost: "registry.simatic-ax.siemens.io",
+      token: process.env.GITHUB_TOKEN,
     },
   ],
   regexManagers: [
