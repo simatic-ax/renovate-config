@@ -18,6 +18,7 @@ module.exports = {
   allowScripts: true,
   exposeAllEnv: true,
   ignoreScripts: true,
+  updatePinnedDependencies : false,
   npmrc: process.env.RENOVATE_NPMRC,
   labels: ["renovate"],
   hostRules: [
