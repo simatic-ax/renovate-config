@@ -37,7 +37,7 @@ module.exports = {
       fileMatch: ["(^|\\/)(test.|test-windows.)?apax.ya?ml$"],
       matchStrings: [
         // We're using `String.raw` here so that the RegEx can be easily copied from/to other tools (e.g. https://regex101.com/)
-        String.raw`"(?<depName>@ax\/.*?)"\s*:\s*"?(?<currentValue>[\d\.^\-\w]*)"?`,
+        String.raw`"(?<depName>@(simatic-ax|ax)\/.*?)"\s*:\s*"?(?<currentValue>[\d\.^\-\w]*)"?`,
       ],
       datasourceTemplate: "npm",
       // Unfortunately setting the registryUrl here does not work properly.
