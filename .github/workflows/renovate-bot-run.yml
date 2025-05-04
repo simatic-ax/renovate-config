@@ -13,7 +13,7 @@ jobs:
   renovate:
     runs-on: ubuntu-24.04
     container: 
-        image: ghcr.io/renovatebot/renovate:37.440
+        image: ghcr.io/renovatebot/renovate:40.1
         options: --user root
 
     steps:
