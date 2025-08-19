@@ -1,5 +1,4 @@
 # Renovate configuration
-![main](https://docs.renovatebot.com/assets/images/mend-renovate-cli-banner.jpg)
 
 The [renovate CLI](https://docs.renovatebot.com/) can be used to automatically update dependencies in your project, once new versions of them have been released or whenever you see need.
 
