@@ -28,7 +28,9 @@ jobs:
           NPMRC_CONTENT=$(curl -f -H "Authorization: bearer ${{ secrets.APAX_TOKEN }}" "https://api.simatic-ax.siemens.io/apax/login?format=npmrc" | sed 's/registry=/@ax:registry=/')
           NPMRC_CONTENT="${NPMRC_CONTENT}"$'\n'"@simatic-ax:registry=https://npm.pkg.github.com/"
           NPMRC_CONTENT="${NPMRC_CONTENT}"$'\n'"//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}"
-          export RENOVATE_NPMRC="${NPMRC_CONTENT}"
+          echo "RENOVATE_NPMRC<<EOF" >> $GITHUB_ENV
+          echo "$NPMRC_CONTENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       
       - name: Self-hosted Renovate
