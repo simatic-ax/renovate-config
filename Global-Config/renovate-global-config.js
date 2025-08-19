@@ -8,7 +8,7 @@ module.exports = {
   gitAuthor: "simatic-ax-bot <ax-public@gmx.de>",
   prFooter: prFooter,
   requireConfig: "required",
-  repositories: ["simatic-ax/lacyccom/"],
+  repositories: ["simatic-ax/lacyccom"],
   dryRun: true,
   allowPostUpgradeCommandTemplating: true,
   allowedPostUpgradeCommands: [".+"],
