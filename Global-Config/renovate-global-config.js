@@ -8,8 +8,8 @@ module.exports = {
   gitAuthor: "simatic-ax-bot <ax-public@gmx.de>",
   prFooter: prFooter,
   requireConfig: "required",
-  autodiscoverFilter: process.env.RENOVATE_AUTODISCOVERFILTER, // 
-  autodiscover: true,
+  repositories: ["simatic-ax/lacyccom/"],
+  dryRun: true,
   allowPostUpgradeCommandTemplating: true,
   allowedPostUpgradeCommands: [".+"],
   logFile: process.env.LOG_FILE,

@@ -2,12 +2,12 @@ name: renovate-bot-run
 
 on:
   workflow_call:
-    inputs:
-      renovate_repository_filter:
-        description: 
-          "This fills the setting autodiscoverFilter of renovate. The name of the repository from which the job was called should be written here, according to the scheme 'simatic-ax/repository_name'"
-        required: true
-        type: string
+    # inputs:
+    #   renovate_repository_filter:
+    #     description: 
+    #       "This fills the setting autodiscoverFilter of renovate. The name of the repository from which the job was called should be written here, according to the scheme 'simatic-ax/repository_name'"
+    #     required: true
+    #     type: string
 
 jobs:
   renovate:
@@ -22,61 +22,15 @@ jobs:
         with:
             ref: ${{ github.ref }}
             
-      - name: set_variables
+      - name: Create .npmrc
         shell: bash
-        env:
-          APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
-          RENOVATE_REPOSITORY_FILTER: ${{ inputs.renovate_repository_filter }}
         run: |
-          curl -H "Authorization: Bearer $APAX_TOKEN" "https://api.simatic-ax.siemens.io/apax/login?format=npmrc" -o .npmrc
-          # Store the npmrc file in the RENOVATE_NPMRC variable so that it can be used in the next step:
-          {
-            echo 'RENOVATE_NPMRC<<EOF'
-            cat .npmrc
-            echo EOF
-          } >> "$GITHUB_ENV"
-          # Store the value of '' in globale variable RENOVATE_AUTODISCOVERFILTER, that is used in renovate-global-config.js om next step:
-          echo "RENOVATE_AUTODISCOVERFILTER=$RENOVATE_REPOSITORY_FILTER" >> "$GITHUB_ENV"
-          
-          # Mask the contents of the npmrc file so that they don't appear in job logs:
-          if [ -f .npmrc ]; then
-            while IFS= read -r line || [ -n "$line" ]; do
-              if [ -n "$line" ] && [[ ! "$line" =~ ^# ]]; then
-                echo "::add-mask::${line}"
-              fi
-            done < .npmrc
-          else
-            echo "Error: .npmrc file not found" >&2
-            exit 1
-          fi
+          NPMRC_CONTENT=$(curl -f -H "Authorization: bearer ${APAX_TOKEN}" "https://api.simatic-ax.siemens.io/apax/login?format=npmrc" | sed 's/registry=/@ax:registry=/')
+          NPMRC_CONTENT="${NPMRC_CONTENT}"$'\n'"@simatic-ax:registry=https://npm.pkg.github.com/"
+          NPMRC_CONTENT="${NPMRC_CONTENT}"$'\n'"//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}"
+          export RENOVATE_NPMRC="${NPMRC_CONTENT}"
 
-      - name: install_apax
-        # In a further step, you can check whether this step can be replaced by an install job from the action repro
-        shell: bash
-        env:
-          APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
-        run: |
-          echo 'Contents of the repository:'
-          ls -la 
-          echo 'Set execute permission for bash script'
-          chmod +x ./Global-Config/install-apax.sh
-          echo 'Call install apax bash script'
-          ./Global-Config/install-apax.sh
-          echo 'Install apax bash script is finished'
       
-      - name: login to registries
-        # In a further step, the job can be exchanged for the login job from action repro
-        shell: bash
-        env:
-          APAX_TOKEN: ${{ secrets.APAX_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo 'Login to AX prod registry'
-          apax login --password $APAX_TOKEN 
-          echo 'Login to github npm registry'
-          apax login --registry "https://npm.pkg.github.com/" --password "$GITHUB_TOKEN"
-  
-
       - name: Self-hosted Renovate
         shell: bash
         run: renovate
