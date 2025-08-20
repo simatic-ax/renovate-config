@@ -8,7 +8,7 @@ packageRules:
   - matchPackagePrefixes:
       - "@ax/"
     registryUrls: 
-      "https://registry.simatic-ax.siemens.io/"
+      - "https://registry.simatic-ax.siemens.io/"
   - matchPackagePrefixes:
       - "@simatic-ax"
     registryUrls: 
