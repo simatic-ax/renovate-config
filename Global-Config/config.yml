@@ -20,5 +20,5 @@ regexManagers:
   - fileMatch:
       - "apax.yml"
     matchStrings:
-      - "^\\s*['\"](?<depName>@[a-zA-Z0-9\\-/]+)['\"]\\s*:\\s*(?<currentValue>[\\^~]?[0-9]+\\.[0-9]+\\.[0-9]+(?:-[a-zA-Z0-9\\.]+)?)"
+      - "^\\s*['\"](?<depName>@[a-zA-Z0-9\\-/]+)['\"]:\\s*(?<currentValue>[^\\s]+)"
     datasourceTemplate: npm
