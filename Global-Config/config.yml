@@ -23,5 +23,5 @@ customManagers:
     fileMatch:
       - "apax.yml"
     matchStrings:
-      - "['\"](?<depName>@(ax|simatic-ax|[a-z0-9\\-]+)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\d+\\.\\d+\\.\\d+(?:-[\\w\\d\\-.]+)?(?:\\+[\\w\\d\\-.]+)?)"
+      - "['\"](?<depName>@(ax|simatic-ax|[a-z0-9\\-]+)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>[\\^~]\\d+\\.\\d+\\.\\d+(?:-[\\w\\d\\-.]+)?(?:\\+[\\w\\d\\-.]+)?)"
     datasourceTemplate: npm
