@@ -16,8 +16,9 @@ packageRules:
     registryUrls: 
       - "https://npm.pkg.github.com/"
 
-regexManagers:
-  - fileMatch:
+customManagers:
+  - customType: regex
+    fileMatch:
       - "apax.yml"
     matchStrings:
       - "^\\s*['\"](?<depName>@[a-zA-Z0-9\\-/]+)['\"]:\\s*(?<currentValue>[^\\s]+)"
