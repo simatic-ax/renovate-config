@@ -2,8 +2,10 @@ platform: github
 repositories:
   - simatic-ax/lacyccom
 dryRun: true
-logLevel: debug
-logFile: renovate.log
+
+enabledManagers:
+  - regex
+
 packageRules:
   - matchPackagePrefixes:
       - "@ax/"
@@ -13,6 +15,7 @@ packageRules:
       - "@simatic-ax"
     registryUrls: 
       - "https://npm.pkg.github.com/"
+
 regexManagers:
   - fileMatch:
       - "apax.yml"
