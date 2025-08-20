@@ -2,6 +2,8 @@ platform: github
 repositories:
   - simatic-ax/lacyccom
 dryRun: true
+baseBranches:
+  - renovate-trials
 
 enabledManagers:
   - regex
