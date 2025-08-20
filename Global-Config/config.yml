@@ -7,10 +7,12 @@ logFile: renovate.log
 packageRules:
   - matchPackagePrefixes:
       - "@ax/"
-    registryUrl: "https://registry.simatic-ax.siemens.io/"
+    registryUrls: 
+      "https://registry.simatic-ax.siemens.io/"
   - matchPackagePrefixes:
       - "@simatic-ax"
-    registryUrl: "https://npm.pkg.github.com/"
+    registryUrls: 
+      - "https://npm.pkg.github.com/"
 regexManagers:
   - fileMatch:
       - "apax.yml"
