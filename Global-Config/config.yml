@@ -1,0 +1,17 @@
+platform: github
+repositories:
+  - simatic-ax/lacyccom
+dryRun: true
+packageRules:
+  - matchPackagePrefixes:
+      - "@ax/"
+    registryUrl: "https://registry.simatic-ax.siemens.io/"
+  - matchPackagePrefixes:
+      - "@simatic-ax"
+    registryUrl: "https://npm.pkg.github.com/"
+regexManagers:
+  - fileMatch:
+      - "apax.yml"
+    matchStrings:
+      - '^\s*[\\\'\"](?<depName>@[a-zA-Z0-9\-/]+)[\\'\"]\s*:\s*(?<currentValue>[\^~]?[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9\.]+)?)'
+    datasourceTemplate: npm
