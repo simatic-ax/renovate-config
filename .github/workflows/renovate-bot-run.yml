@@ -37,6 +37,6 @@ jobs:
         shell: bash
         run: renovate
         env:
-          RENOVATE_CONFIG_FILE: "Global-Config/renovate-global-config.js"
+          RENOVATE_CONFIG_FILE: "Global-Config/config.yml"
           LOG_LEVEL: "debug"
           RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
