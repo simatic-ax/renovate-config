@@ -18,13 +18,19 @@ module.exports = {
   allowScripts: true,
   exposeAllEnv: true,
   ignoreScripts: true,
+  updatePinnedDependencies : false,
   npmrc: process.env.RENOVATE_NPMRC,
   labels: ["renovate"],
   hostRules: [
     {
       hostType: "npm",
       matchHost: "registry.simatic-ax.siemens.io",
-      token: process.env.RENOVATE_APAX_TOKEN,
+      token: process.env.APAX_TOKEN,
+    },
+    {
+      hostType: "npm",
+      matchHost: "https://npm.pkg.github.com/",
+      token: process.env.GITHUB_TOKEN,
     },
   ],
   regexManagers: [
@@ -32,7 +38,7 @@ module.exports = {
       fileMatch: ["(^|\\/)(test.|test-windows.)?apax.ya?ml$"],
       matchStrings: [
         // We're using `String.raw` here so that the RegEx can be easily copied from/to other tools (e.g. https://regex101.com/)
-        String.raw`"(?<depName>@ax\/.*?)"\s*:\s*"?(?<currentValue>[\d\.^\-\w]*)"?`,
+        String.raw`"(?<depName>@(simatic-ax|ax)\/.*?)"\s*:\s*"?(?<currentValue>[\d\.^\-\w]*)"?`,
       ],
       datasourceTemplate: "npm",
       // Unfortunately setting the registryUrl here does not work properly.
@@ -91,7 +97,7 @@ module.exports = {
           // splite SDK out that it doesn't follow the rules regarding breaking changes and version number assignment
           "matchPackagePatterns": ["^@{0,1}[Aa][Xx]/[Ss][Dd][Kk]"],
           "groupName": "AX-Product SDK",
-          "matchUpdateTypes": ["major", "minor", "patch", "pin", "pinDigest", "digest", "lockFileMaintenance", "rollback", "bump"],
+          "matchUpdateTypes": ["major", "minor", "patch", "digest", "lockFileMaintenance", "rollback", "bump"],
       },
     {
     // ax simatic dependencies separated because of breaking changes
