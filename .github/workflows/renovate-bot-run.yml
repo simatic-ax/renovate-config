@@ -1,13 +1,9 @@
 name: renovate-bot-run
 
 on:
-  workflow_call:
-    # inputs:
-    #   renovate_repository_filter:
-    #     description: 
-    #       "This fills the setting autodiscoverFilter of renovate. The name of the repository from which the job was called should be written here, according to the scheme 'simatic-ax/repository_name'"
-    #     required: true
-    #     type: string
+  # Läuft jeden Sonntag um 15:00 UTC
+  schedule:
+    - cron: '0 15 * * 0'
 
 jobs:
   renovate:
@@ -19,8 +15,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-            ref: ${{ github.ref }}
             
       - name: Create .npmrc
         shell: bash

@@ -1,0 +1,78 @@
+name: Validate Renovate Configuration
+
+on:
+  # 1. Läuft bei Pull Requests (auch bei Updates)
+  pull_request:
+    paths:
+      - 'Global-Config/**'
+      - '.github/workflows/**'
+  
+  # 2. Läuft bei Push auf main Branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'Global-Config/**'
+      - '.github/workflows/**'
+  
+  # 3. Manueller Start mit Repository und Branch Parameter
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: 'Target repository to validate against (simatic-ax/repo-name)'
+        required: true
+        type: string
+      branch:
+        description: 'Target branch to validate against'
+        required: false
+        type: string
+        default: 'main'
+
+jobs:
+  validate-config:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Validate Renovate Configuration
+        uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.0.1
+        with:
+          config_file_path: Global-Config/config.yml
+
+  test-config:
+    runs-on: ubuntu-24.04
+    container: 
+      image: ghcr.io/renovatebot/renovate:37
+      options: --user root
+    needs: validate-config
+    
+    # Nur bei manueller Ausführung oder wenn explizit ein Repository angegeben wurde
+    if: github.event_name == 'workflow_dispatch'    
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+            
+      - name: Create .npmrc
+        shell: bash
+        run: |
+          NPMRC_CONTENT=$(curl -f -H "Authorization: bearer ${{ secrets.APAX_TOKEN }}" "https://api.simatic-ax.siemens.io/apax/login?format=npmrc" | sed 's/registry=/@ax:registry=/')
+          NPMRC_CONTENT="${NPMRC_CONTENT}"$'\n'"@simatic-ax:registry=https://npm.pkg.github.com/"
+          NPMRC_CONTENT="${NPMRC_CONTENT}"$'\n'"//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}"
+          echo "RENOVATE_NPMRC<<EOF" >> $GITHUB_ENV
+          echo "$NPMRC_CONTENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+            
+      - name: Test Renovate Configuration (Dry Run)
+        shell: bash
+        run: renovate
+        env:
+          RENOVATE_CONFIG_FILE: "Global-Config/config.yml"
+          LOG_LEVEL: "debug"
+          RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RENOVATE_DRY_RUN: "true"
+          RENOVATE_REPOSITORIES: ${{ inputs.repository }}
+          RENOVATE_BASE_BRANCHES: ${{ inputs.branch }}
+          RENOVATE_AUTODISCOVER: "false"
+          RENOVATE_REQUIRE_CONFIG: "required"

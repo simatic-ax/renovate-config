@@ -1,102 +1,289 @@
-# Renovate configuration
-![main](https://docs.renovatebot.com/assets/images/mend-renovate-cli-banner.jpg)
+# Renovate Configuration
 
-The [renovate CLI](https://docs.renovatebot.com/) can be used to automatically update dependencies in your project, once new versions of them have been released or whenever you see need.
+![Renovate Banner](https://docs.renovatebot.com/assets/images/mend-renovate-cli-banner.jpg)
 
-To support the user in setting up the required infrastructure, two things are being offered:
-- A workflow that automatically detects and applies updates of a dependency
-  - The execution happens for all repositories within the SIMATIC AX GitHub organization
-  - Schedule: Once, every Sunday
-- A workflow that enables the maintainer of a repository to manually trigger the detection and application of dependency updates
+This repository contains the centralized Renovate configuration for all repositories within the SIMATIC AX GitHub organization. It provides automated dependency management through scheduled runs and manual triggers.
 
-Once the Renovate bot discovered newly available versions of a dependency, it'll automatically set up a pull request wherein the updates have been applied. This supports the user in deciding if and when to update dependencies of a project.
+## Overview
 
-## Incorporating the Renovate workflow in your own repository
+Renovate is configured to:
+- Automatically scan all repositories in the `simatic-ax` organization
+- Create pull requests for dependency updates based on defined rules
+- Support custom package managers and registries specific to SIMATIC AX
 
-The Renovate workflow defined inside this repository can be reused inside workflows of other repositories. To do so, for any given repository, include a YML file inside the .github/workflows folder, containing at least the following declarations:
+## Configuration Structure
 
-```yml
-name: my-renovate-call
+### Core Configuration (`config.yml`)
 
-on:
-  *my_trigger*:
+The main configuration file defines the following key properties:
 
-jobs:
- my-renovate-call:
-    uses: ./.github/workflows/renovate-bot-run.yml
-    secrets: inherit
-    with:
-        renovate_reposetory_filter: "simatic-ax/*my_repository_name*"
+#### Basic Settings
+
+```yaml
+platform: "github"                    # Target platform
+gitAuthor: "simatic-ax-bot <...>"     # Author for commits and PRs
+onboarding: true                      # Enable onboarding for new repositories
+autodiscoverFilter: "simatic-ax/*"    # Repository discovery filter
+separateMajorMinor: false             # Group major and minor updates together
 ```
 
-This will configure a GitHub workflow, named my-renovate-call whose job simply references and executes the workflow provided by **THIS** repository to run the Renovate bot inside a CI pipeline of your own repository.
+#### Package Managers
 
-Further information on how to facilitate GitHub actions and workflows can be found [here](https://docs.github.com/en/actions).
+```yaml
+enabledManagers:
+  - regex                             # Enable regex-based custom manager
+```
 
-# General structure
+#### Registry Configuration
 
-- ./.github/workflows
-  - Contains the YML definition of the workflows
-- ./Global-Config
-  - Contains the default presets for the Renovate bot
-  - Contains a script to further configure the runtime environment of the bot
-- ./renovate.json
-  - Enables the general usage of a Renovate bot for the given repository
-The execution is carried out via the [renovate action](https://github.com/simatic-ax/renovate-config/blob/chore/set_up_renovate/.github/workflows/renovate.yml), which can be found in the .github\workflows folder.
+```yaml
+packageRules:
+  - matchPackagePrefixes:
+      - "@ax/"
+    registryUrls: 
+      - "https://registry.simatic-ax.siemens.io/"
+  - matchPackagePrefixes:
+      - "@simatic-ax"
+    registryUrls: 
+      - "https://npm.pkg.github.com/"
+```
 
-## Renovate workflows
+#### Update Branching Strategy
 
-### Automatic execution
+```yaml
+# Major updates go to main branch only
+- matchUpdateTypes:
+    - major
+  baseBranches:
+    - main
+  groupName: "all major dependencies"
 
-The automatic execution of the Renovate bot includes the following major steps:
-- Check out the repository which is to be updated
-- Configure the environment and install SIMATIC AX tooling, namely apax
-- Add the SIMATIC AX registry and the repositories to be updated
-- Pass the configuration files to the Renovate bot and start execution
+# Minor/patch updates go to both release/* and main branches
+- matchUpdateTypes:
+    - minor
+    - patch
+  baseBranches:
+    - release/*
+    - main
+  groupName: "all non-major dependencies"
+```
 
-### Manual execution
+#### Custom Managers
 
-The manual execution does the exact same thing, except it offers a button to the user to run the Renovate bot manually whenever required.
+```yaml
+customManagers:
+  - customType: regex
+    fileMatch:
+      - "apax.yml"
+    matchStrings:
+      - "['\"](?<depName>@(ax|simatic-ax|[a-z0-9\\-]+)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>[\\^~]\\d+\\.\\d+\\.\\d+(?:-[\\w\\d\\-.]+)?(?:\\+[\\w\\d\\-.]+)?)"
+    datasourceTemplate: npm
+```
 
-## Renovate configuration
+## Pull Request Creation Examples
 
-### Entry point
+### Scenario 1: Major Update
 
-The [renovate-entrypoint.sh](./Global-Config/renovate-entrypoint.sh) serves as an entry point for the Renovate bot. By adapting the file the user may control the installation of required prerequisites dependening on his own requirements. In its current implementation the script installs apax inside the image that is running the Renovate bot. This is required in order for the Renovate bot to communicate with the SIMATIC AX registry and check package versions.
+**Repository state:**
+- Current dependency: `@ax/system-commons: "1.5.2"`
+- Available version: `2.0.0`
 
-### Global configuration
+**Renovate behavior:**
+- Creates PR against `main` branch
+- PR title: "Update all major dependencies"
+- Groups all major updates in single PR
+- Branch name: `renovate/all-major-dependencies`
 
-The current configuration, which will be applied to the Renovate bot can be found inside the [renovate-global-config.js](./Global-Config/renovate-global-config.js).
+### Scenario 2: Minor/Patch Update
 
-The most important settings are:
-  - hostRules
-    - Tells the Renovate bot in which remote registry to lookup dependencies
-    - May be extended to include other package registries as well
-  - regexManagers
-    - Tells the Renovate bot which files to check for possible dependencies
-    - Tells the Renovate bot how to identify dependencies inside those files
-  - packageRules
-    - Tells the Renovate bot when and how to update the found dependencies
+**Repository state:**
+- Current dependency: `@simatic-ax/apax-build-helper: "1.2.0"`
+- Available version: `1.3.1`
 
-For more detailed information regarding the configuration, see the [official renovate documentation](https://docs.renovatebot.com/configuration-options/)
+**Renovate behavior:**
+- Creates PRs against both `main` and any `release/*` branches
+- PR title: "Update all non-major dependencies"
+- Groups all minor/patch updates together
+- Respects SemVer compatibility per branch
 
+### Scenario 3: New Repository Onboarding
 
-### Customizing and extending the configuration
+**Repository state:**
+- No `renovate.json` configuration file
+- Repository matches `simatic-ax/*` pattern
 
-One may either simply use the existing configuration, or extend it wherever necessary. In case you require additional parameterization of the Renovate bot, or in case you'd like to override an existing setting, adapt the [renovate.json](./renovate.json) inside your own repository. Once done, the set of settings to configure the bot will be an aggregation of the globally defined [renovate-global-config.js](./Global-Config/renovate-global-config.js) and the renovate.json file inside the respective repository.
+**Renovate behavior:**
+- Creates onboarding PR with title "Configure Renovate"
+- Adds basic `renovate.json` configuration
+- PR must be merged to enable ongoing dependency updates
 
-The following example of a renovate.json configuration will:
-  - extend the global configuration, such that a dashboard will be shown inside the update pull request
-  - overwrites the handling of minor and major version while updating.
+## Customization Points
+
+### 1. Repository-Level Configuration
+
+Create a `renovate.json` file in your repository root to override or extend the global configuration:
 
 ```json
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
   "separateMajorMinor": true,
-  "dependencyDashboard": true
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^@my-org/"],
+      "groupName": "My Organization packages"
+    }
+  ]
 }
 ```
 
-Further information on what and how to configure can be found [here](https://docs.renovatebot.com/configuration-options/)
+### 2. Additional Package Managers
 
-Note, that every single property of the global configuration could be altered this way, in case required.
+Extend the `enabledManagers` array to support additional package managers:
+
+```yaml
+enabledManagers:
+  - regex
+  - dockerfile
+  - github-actions
+```
+
+### 3. Custom Registry Rules
+
+Add new package rules for different registries:
+
+```yaml
+packageRules:
+  - matchPackagePrefixes:
+      - "@your-org/"
+    registryUrls: 
+      - "https://your-registry.com/"
+```
+
+### 4. Branch Strategy Customization
+
+Modify the branching strategy for different update types:
+
+```yaml
+packageRules:
+  - matchUpdateTypes:
+      - major
+    baseBranches:
+      - development
+    assignees: ["@team-lead"]
+```
+
+### 5. Custom File Pattern Matching
+
+Extend regex managers to support additional file formats:
+
+```yaml
+customManagers:
+  - customType: regex
+    fileMatch:
+      - "package.json"
+      - "requirements.txt"
+    matchStrings:
+      - "your-custom-pattern-here"
+```
+
+## Workflows
+
+This repository includes two main workflows for Renovate management:
+
+### 1. Renovate Bot Run (`renovate-bot-run.yml`)
+
+**Purpose:** Production Renovate execution across all SIMATIC AX repositories
+
+**Triggers:**
+- **Scheduled:** Every Sunday at 15:00 UTC
+
+**Behavior:**
+- Scans all repositories matching `autodiscoverFilter: "simatic-ax/*"`
+- Creates dependency update PRs according to the configuration
+- Handles onboarding for repositories without Renovate configuration
+
+### 2. Configuration Validation (`validate-renovate-config.yml`)
+
+**Purpose:** Validates Renovate configuration and tests against specific repositories
+
+**Triggers:**
+- **Pull Requests:** When configuration files are changed
+- **Push to main:** When changes are merged to the main branch  
+- **Manual:** With repository and branch selection for testing
+
+**Jobs:**
+- `validate-config`: Validates `config.yml` syntax and structure using `github-action-renovate-config-validator`
+- `test-config`: Performs dry-run test against specified repository (manual trigger only)
+
+**Test Features:**
+- Dry-run mode (no actual changes)
+- Configurable target repository and branch
+- Requires existing Renovate configuration in target repository
+
+## Usage
+
+### Testing Configuration Changes
+
+1. **Automatic Validation:** Configuration changes are automatically validated when you create a pull request
+2. **Manual Testing:** Use the "Validate Renovate Configuration" workflow to test against a specific repository:
+   - Go to Actions → "Validate Renovate Configuration" → "Run workflow"
+   - Enter target repository (e.g., `simatic-ax/lacyccom`)
+   - Optionally specify a branch (defaults to `main`)
+
+### Production Updates
+
+- **Automatic:** Renovate runs every Sunday at 15:00 UTC across all SIMATIC AX repositories
+- **Manual:** Trigger via other workflows using `workflow_call`
+
+## Workflow Triggers
+
+### Automatic Execution
+- **Schedule:** Every Sunday at 15:00 UTC  
+- **Scope:** All repositories matching `autodiscoverFilter`
+- **Trigger:** GitHub Actions cron schedule
+
+### Manual Execution
+- **Configuration Testing:** `workflow_dispatch` with repository and branch parameters
+- **Production Runs:** `workflow_call` from other workflows
+- **Validation:** Automatic on pull requests and pushes to main branch
+- **Use case:** On-demand updates for specific repositories
+
+## Repository States and Behavior
+
+| Repository State | Renovate Behavior |
+|------------------|-------------------|
+| Has `renovate.json` | Regular dependency scanning and PR creation |
+| No configuration | Creates onboarding PR |
+| Onboarding PR closed/rejected | Repository ignored until PR is merged |
+| Contains supported files (`apax.yml`) | Scans for dependencies using custom managers |
+
+## Advanced Configuration Options
+
+### Grouping Strategies
+- **Default:** Groups by update type (major vs. non-major)
+- **Custom:** Define package-specific groups
+- **Monorepo:** Handle multiple packages in single repository
+
+### Security Updates
+- Automatic creation of security-focused PRs
+- Priority handling for vulnerability fixes
+- Integration with security scanning tools
+
+### Automerge Rules
+Configure automatic merging for specific update types:
+
+```json
+{
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch"],
+      "matchPackagePatterns": ["^@simatic-ax/"],
+      "automerge": true
+    }
+  ]
+}
+```
+
+For comprehensive configuration options, refer to the [official Renovate documentation](https://docs.renovatebot.com/configuration-options/).
