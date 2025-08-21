@@ -1,9 +1,6 @@
-platform: github
-repositories:
-  - simatic-ax/lacyccom
-dryRun: true
-baseBranches:
-  - renovate-trials
+platform: "github"
+gitAuthor: "simatic-ax-bot <ax-public@gmx.de>"
+onboarding: true
 
 enabledManagers:
   - regex
@@ -17,6 +14,18 @@ packageRules:
       - "@simatic-ax"
     registryUrls: 
       - "https://npm.pkg.github.com/"
+  - matchUpdateTypes:
+      - major
+    baseBranches:
+      - main
+    groupName: "all major dependencies"
+  - matchUpdateTypes:
+      - minor
+      - patch
+    baseBranches:
+      - release/*
+      - main
+    groupName: "all non-major dependencies"
 
 customManagers:
   - customType: regex

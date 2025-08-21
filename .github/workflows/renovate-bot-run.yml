@@ -31,7 +31,6 @@ jobs:
           echo "RENOVATE_NPMRC<<EOF" >> $GITHUB_ENV
           echo "$NPMRC_CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
-
       
       - name: Self-hosted Renovate
         shell: bash
