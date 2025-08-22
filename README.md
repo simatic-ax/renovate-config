@@ -1,6 +1,4 @@
-# Renovate Configuration
-
-![Renovate Banner](https://docs.renovatebot.com/assets/images/mend-renovate-cli-banner.jpg)
+# Renovate configuration
 
 This repository contains the centralized Renovate configuration for all repositories within the SIMATIC AX GitHub organization. It provides automated dependency management through scheduled runs and manual triggers.
 
