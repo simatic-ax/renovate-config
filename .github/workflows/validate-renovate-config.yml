@@ -43,7 +43,7 @@ jobs:
   test-config:
     runs-on: ubuntu-24.04
     container: 
-      image: ghcr.io/renovatebot/renovate:37
+      image: ghcr.io/renovatebot/renovate:41.82.3
       options: --user root
     needs: validate-config
     
