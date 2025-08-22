@@ -1,0 +1,38 @@
+platform: "github"
+gitAuthor: "simatic-ax-bot <ax-public@gmx.de>"
+onboarding: true
+autodiscoverFilter: "simatic-ax/*"
+separateMajorMinor: false
+
+enabledManagers:
+  - regex
+
+packageRules:
+  - matchPackagePrefixes:
+      - "@ax/"
+    registryUrls: 
+      - "https://registry.simatic-ax.siemens.io/"
+  - matchPackagePrefixes:
+      - "@simatic-ax"
+    registryUrls: 
+      - "https://npm.pkg.github.com/"
+  - matchUpdateTypes:
+      - major
+    baseBranches:
+      - main
+    groupName: "all major dependencies"
+  - matchUpdateTypes:
+      - minor
+      - patch
+    baseBranches:
+      - release/*
+      - main
+    groupName: "all non-major dependencies"
+
+customManagers:
+  - customType: regex
+    fileMatch:
+      - "apax.yml"
+    matchStrings:
+      - "['\"](?<depName>@(ax|simatic-ax|[a-z0-9\\-]+)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>[\\^~]\\d+\\.\\d+\\.\\d+(?:-[\\w\\d\\-.]+)?(?:\\+[\\w\\d\\-.]+)?)"
+    datasourceTemplate: npm
