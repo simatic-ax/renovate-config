@@ -6,6 +6,7 @@ separateMajorMinor: false
 
 enabledManagers:
   - regex
+  - docker
 
 packageRules:
   - matchPackagePrefixes:
