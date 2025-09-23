@@ -1,6 +1,7 @@
 platform: "github"
 gitAuthor: "simatic-ax-bot <ax-public@gmx.de>"
-onboarding: true
+onboarding: false
+requireConfig: true
 autodiscoverFilter: "simatic-ax/*"
 separateMajorMinor: false
 
