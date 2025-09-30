@@ -22,14 +22,14 @@ packageRules:
       - major
     baseBranches:
       - main
-    groupName: "all major dependencies"
+    groupName: "Update dependencies to latest major version"
   - matchUpdateTypes:
       - minor
       - patch
     baseBranches:
       - release/*
       - main
-    groupName: "all non-major dependencies"
+    groupName: "Update dependencies to latest minor or patch version"
 
 customManagers:
   - customType: regex
