@@ -196,44 +196,51 @@ This repository includes two main workflows for Renovate management:
 
 **Triggers:**
 - **Scheduled:** Every Sunday at 15:00 UTC
+- **Manual:** workflow_dispatch with target repository and branch selection
 
 **Behavior:**
-- Scans all repositories matching `autodiscoverFilter: "simatic-ax/*"`
+- **Scheduled runs:** Scans all repositories matching `autodiscoverFilter: "simatic-ax/*"` 
+- **Manual runs:** Targets specific repository and branch specified in inputs
 - Creates dependency update PRs according to the configuration
 - Handles onboarding for repositories without Renovate configuration
+- **Production mode:** Makes actual changes (creates real PRs)
 
 ### 2. Configuration Validation (`validate-renovate-config.yml`)
 
-**Purpose:** Validates Renovate configuration and tests against specific repositories
+**Purpose:** Validates Renovate configuration syntax
 
 **Triggers:**
 - **Pull Requests:** When configuration files are changed
-- **Push to main:** When changes are merged to the main branch  
-- **Manual:** With repository and branch selection for testing
+- **Push to main:** When changes are merged to the main branch
 
 **Jobs:**
 - `validate-config`: Validates `config.yml` syntax and structure using `github-action-renovate-config-validator`
-- `test-config`: Performs dry-run test against specified repository (manual trigger only)
 
-**Test Features:**
-- Dry-run mode (no actual changes)
-- Configurable target repository and branch
-- Requires existing Renovate configuration in target repository
+**Features:**
+- Automatic syntax validation
+- Runs on configuration file changes only
+- Fast feedback for configuration errors
 
 ## Usage
 
 ### Testing Configuration Changes
 
 1. **Automatic Validation:** Configuration changes are automatically validated when you create a pull request
-2. **Manual Testing:** Use the "Validate Renovate Configuration" workflow to test against a specific repository:
-   - Go to Actions → "Validate Renovate Configuration" → "Run workflow"
-   - Enter target repository (e.g., `simatic-ax/lacyccom`)
-   - Optionally specify a branch (defaults to `main`)
+2. **Manual Testing:** Use `act` for local testing:
+   ```bash
+   # Test configuration locally
+   act workflow_dispatch --secret-file .secrets --workflows .github/workflows/validate-renovate-config.yml
+   
+   # Test against specific repository
+   act workflow_dispatch --secret-file .secrets \
+     --input target-repo="simatic-ax/your-repo" \
+     --input target-branch="main"
+   ```
 
 ### Production Updates
 
 - **Automatic:** Renovate runs every Sunday at 15:00 UTC across all SIMATIC AX repositories
-- **Manual:** Trigger via other workflows using `workflow_call`
+- **Manual:** Use workflow_dispatch to target specific repositories and branches
 
 ## Workflow Triggers
 
@@ -243,10 +250,9 @@ This repository includes two main workflows for Renovate management:
 - **Trigger:** GitHub Actions cron schedule
 
 ### Manual Execution
-- **Configuration Testing:** `workflow_dispatch` with repository and branch parameters
-- **Production Runs:** `workflow_call` from other workflows
+- **Targeted Repository Testing:** `workflow_dispatch` with target-repo and target-branch parameters
 - **Validation:** Automatic on pull requests and pushes to main branch
-- **Use case:** On-demand updates for specific repositories
+- **Use case:** On-demand updates for specific repositories and branches
 
 ## Repository States and Behavior
 
@@ -349,7 +355,11 @@ To run the complete renovate workflow locally:
 
 ```bash
 # Run the renovate workflow with secrets (.actrc provides default configuration)
+# WARNING: This runs in PRODUCTION mode and will create real PRs!
 act workflow_dispatch --secret-file .secrets
+
+# For testing, add dry-run mode
+act workflow_dispatch --secret-file .secrets --env RENOVATE_DRY_RUN=full
 ```
 
 #### Testing Against Specific Repository
@@ -357,16 +367,18 @@ act workflow_dispatch --secret-file .secrets
 To test against a specific repository (using workflow inputs):
 
 ```bash
-# Test against a specific repository with default base branch (renovate-test-branch)
+# Test against a specific repository (PRODUCTION mode - creates real PRs!)
 act workflow_dispatch \
   --secret-file .secrets \
-  --input repo="simatic-ax/your-target-repo"
+  --input target-repo="simatic-ax/your-target-repo" \
+  --input target-branch="main"
 
-# Test against a specific repository with custom base branch
+# Test against a release branch with dry-run for safety
 act workflow_dispatch \
   --secret-file .secrets \
-  --input repo="simatic-ax/your-target-repo" \
-  --env RENOVATE_BASE_BRANCH_PATTERNS="main"
+  --input target-repo="simatic-ax/your-target-repo" \
+  --input target-branch="release/v1.0" \
+  --env RENOVATE_DRY_RUN=full
 ```
 
 #### PowerShell Helper Script
@@ -380,10 +392,10 @@ param(
     [string]$TargetRepo = "",
     
     [Parameter(Mandatory=$false)]
-    [string]$BaseBranch = "renovate-test-branch",
+    [string]$TargetBranch = "main",
     
     [Parameter(Mandatory=$false)]
-    [switch]$DryRun = $true,
+    [switch]$DryRun = $false,
     
     [Parameter(Mandatory=$false)]
     [string]$Workflow = "renovate-bot-run"
@@ -403,18 +415,18 @@ if ($Workflow -eq "renovate-bot-run") {
     $actCommand += @("--workflows", ".github/workflows/renovate-bot-run.yml")
 }
 
-# Add repository input if specified
+# Add repository and branch inputs if specified
 if ($TargetRepo) {
-    $actCommand += @("--input", "repo=$TargetRepo")
+    $actCommand += @("--input", "target-repo=$TargetRepo")
+    $actCommand += @("--input", "target-branch=$TargetBranch")
 }
 
-# Add base branch environment variable
-$actCommand += @("--env", "RENOVATE_BASE_BRANCH_PATTERNS=$BaseBranch")
-
-# Add dry-run environment variable
+# Add dry-run environment variable if requested
 if ($DryRun) {
     Write-Host "Running in DRY-RUN mode (no actual changes will be made)" -ForegroundColor Yellow
     $actCommand += @("--env", "RENOVATE_DRY_RUN=full")
+} else {
+    Write-Host "Running in PRODUCTION mode (will make actual changes!)" -ForegroundColor Red
 }
 
 Write-Host "Executing: $($actCommand -join ' ')" -ForegroundColor Green
@@ -423,17 +435,17 @@ Write-Host "Executing: $($actCommand -join ' ')" -ForegroundColor Green
 
 Usage:
 ```powershell
-# Run against all repositories with default test branch
+# Run against all repositories (autodiscover mode) - PRODUCTION
 .\run-renovate-act.ps1
 
-# Test against specific repository and branch
-.\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo" -BaseBranch "main"
+# Test against specific repository and branch - PRODUCTION
+.\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo" -TargetBranch "release/v1.0"
+
+# Run in dry-run mode for testing
+.\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo" -DryRun
 
 # Run validation workflow
 .\run-renovate-act.ps1 -Workflow "validate-renovate-config"
-
-# Run without dry-run (make actual changes)
-.\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo" -DryRun:$false
 ```
 
 #### Bash Helper Script
@@ -448,8 +460,8 @@ set -e
 
 # Default values
 TARGET_REPO=""
-BASE_BRANCH="renovate-test-branch"
-DRY_RUN=true
+TARGET_BRANCH="main"
+DRY_RUN=false
 WORKFLOW="renovate-bot-run"
 
 # Parse command line arguments
@@ -459,21 +471,21 @@ while [[ $# -gt 0 ]]; do
       TARGET_REPO="$2"
       shift 2
       ;;
-    --base-branch)
-      BASE_BRANCH="$2"
+    --branch)
+      TARGET_BRANCH="$2"
       shift 2
       ;;
     --workflow)
       WORKFLOW="$2"
       shift 2
       ;;
-    --no-dry-run)
-      DRY_RUN=false
+    --dry-run)
+      DRY_RUN=true
       shift
       ;;
     *)
       echo "Unknown option $1"
-      echo "Usage: $0 [--repo <repository>] [--base-branch <branch>] [--workflow <workflow>] [--no-dry-run]"
+      echo "Usage: $0 [--repo <repository>] [--branch <branch>] [--workflow <workflow>] [--dry-run]"
       exit 1
       ;;
   esac
@@ -495,18 +507,18 @@ elif [[ "$WORKFLOW" == "validate-renovate-config" ]]; then
   act_cmd+=("--workflows" ".github/workflows/validate-renovate-config.yml")
 fi
 
-# Add repository input if specified
+# Add repository and branch inputs if specified
 if [[ -n "$TARGET_REPO" ]]; then
-  act_cmd+=("--input" "repo=$TARGET_REPO")
+  act_cmd+=("--input" "target-repo=$TARGET_REPO")
+  act_cmd+=("--input" "target-branch=$TARGET_BRANCH")
 fi
 
-# Add base branch environment variable
-act_cmd+=("--env" "RENOVATE_BASE_BRANCH_PATTERNS=$BASE_BRANCH")
-
-# Add dry-run environment variable
+# Add dry-run environment variable if requested
 if [[ "$DRY_RUN" == "true" ]]; then
   echo "Running in DRY-RUN mode (no actual changes will be made)"
   act_cmd+=("--env" "RENOVATE_DRY_RUN=full")
+else
+  echo "Running in PRODUCTION mode (will make actual changes!)"
 fi
 
 echo "Executing: ${act_cmd[*]}"
@@ -517,17 +529,17 @@ Usage:
 ```bash
 chmod +x run-renovate-act.sh
 
-# Run against all repositories with default test branch
+# Run against all repositories (autodiscover mode) - PRODUCTION
 ./run-renovate-act.sh
 
-# Test against specific repository and branch
-./run-renovate-act.sh --repo "simatic-ax/your-repo" --base-branch "main"
+# Test against specific repository and branch - PRODUCTION
+./run-renovate-act.sh --repo "simatic-ax/your-repo" --branch "release/v1.0"
+
+# Run in dry-run mode for testing
+./run-renovate-act.sh --repo "simatic-ax/your-repo" --dry-run
 
 # Run validation workflow
 ./run-renovate-act.sh --workflow "validate-renovate-config"
-
-# Run without dry-run (make actual changes)
-./run-renovate-act.sh --repo "simatic-ax/your-repo" --no-dry-run
 ```
 ```
 
@@ -549,15 +561,17 @@ chmod +x run-renovate-local.sh
 After modifying `Global-Config/config.yml`:
 
 ```bash
-# Validate configuration and test with act
+# Validate configuration syntax
 act workflow_dispatch --secret-file .secrets --workflows .github/workflows/validate-renovate-config.yml
 ```
 
 #### 2. Testing Against Specific Repository
 
 ```bash
-# Test against a specific repository
-act workflow_dispatch --secret-file .secrets --input repo="simatic-ax/your-repo"
+# Test against a specific repository and branch
+act workflow_dispatch --secret-file .secrets \
+  --input target-repo="simatic-ax/your-repo" \
+  --input target-branch="main"
 ```
 
 #### 3. Testing Lockfile Maintenance
@@ -565,8 +579,10 @@ act workflow_dispatch --secret-file .secrets --input repo="simatic-ax/your-repo"
 To specifically test lockfile maintenance behavior:
 
 ```bash
-# Run workflow that will trigger lockfile maintenance for eligible repositories
-act workflow_dispatch --secret-file .secrets --input repo="simatic-ax/your-repo"
+# Run workflow against repository with apax.yml files
+act workflow_dispatch --secret-file .secrets \
+  --input target-repo="simatic-ax/your-repo" \
+  --input target-branch="main"
 ```
 
 ### Advanced act Usage
@@ -578,7 +594,8 @@ Create an `event.json` file for more complex testing:
 ```json
 {
   "inputs": {
-    "repo": "simatic-ax/your-target-repo"
+    "target-repo": "simatic-ax/your-target-repo",
+    "target-branch": "release/v1.0"
   }
 }
 ```
@@ -651,6 +668,8 @@ act workflow_dispatch --secret-file .secrets --verbose
 - Use temporary tokens for local development when possible
 - Regularly rotate your development tokens
 - Consider using GitHub CLI authentication instead of manual token management
+
+⚠️ **Important:** The default mode is **PRODUCTION** - renovate will create real PRs! Use `--dry-run` flag for testing.
 
 ```bash
 # Alternative: Use GitHub CLI for authentication
