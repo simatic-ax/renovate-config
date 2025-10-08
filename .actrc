@@ -1,0 +1,14 @@
+# Act configuration file
+# This file configures act to run GitHub Actions locally
+
+# Use specific platform mapping for ubuntu-24.04
+-P ubuntu-24.04=ubuntu:24.04
+
+# Set container architecture (if needed)
+--container-architecture linux/amd64
+
+# Use Docker networking
+--use-gitignore
+
+# Verbose output for debugging
+--verbose

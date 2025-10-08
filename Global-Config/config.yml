@@ -7,7 +7,6 @@ separateMajorMinor: false
 
 enabledManagers:
   - regex
-  - docker
 
 packageRules:
   - matchPackagePrefixes:
@@ -30,11 +29,36 @@ packageRules:
       - release/*
       - main
     groupName: "Update dependencies to latest minor or patch version"
+  - matchManagers:
+      - regex
+    matchCurrentVersion: \^\d+\.\d+\.\d+
+    rangeStrategy: bump
+
+# Lockfile Maintenance Konfiguration
+lockFileMaintenance:
+  enabled: true
+  schedule: ["before 4am on Monday"]
+  branchTopic: "renovate/minor-patch-updates"
+  commitMessageAction: "Lock file maintenance"
+  prTitle: "chore(deps): Updates minor and patch versions in the apax-lock.json"
+  baseBranches: ["main", "release/*"]
+
+# post upgrade tasks for detecting minor/ patch updates in apax.yml and updating apax-lock.json
+postUpgradeTasks:
+  commands:
+    # remove the existing lockfile to ensure a fresh one is created
+    # apax would fall back to the existing lockfile if it exists and could not detect updates
+    - "rm -f apax-lock.json"
+    - "apax install"
+  fileFilters:
+    - "apax-lock.json"
+  executionMode: "update"
 
 customManagers:
   - customType: regex
     fileMatch:
       - "apax.yml"
     matchStrings:
-      - "['\"](?<depName>@(ax|simatic-ax|[a-z0-9\\-]+)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>[\\^~]\\d+\\.\\d+\\.\\d+(?:-[\\w\\d\\-.]+)?(?:\\+[\\w\\d\\-.]+)?)"
+      - "['\"](?<depName>@(ax|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+)"
     datasourceTemplate: npm
+

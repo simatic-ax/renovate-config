@@ -1,26 +1,40 @@
 name: renovate-bot-run
 
 on:
-  # Läuft jeden Sonntag um 15:00 UTC
+  # Runs every Sunday 3:00pm UTC
   schedule:
     - cron: '0 15 * * 0'
   workflow_dispatch:
     inputs:
-      repo:
+      target-repo:
         description: 'Pick a specific repo to execute renovate on (e.g. simatic-ax/<repo-name>)'
-        required: false
+        required: true
         type: string
+      target-branch:
+        description: 'Pick a specific branch to execute renovate on (e.g. main, release/*)'
+        required: true
+        type: string
+      
 
 jobs:
   renovate:
     runs-on: ubuntu-24.04
     container: 
-        image: ghcr.io/renovatebot/renovate:41.82.3
-        options: --user root
+        image: ghcr.io/simatic-ax/ci-images/apax-ci-image:4.1.1
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install Renovate
+        run: npm install -g renovate@39.264.1
+            
+      - name: Login with apax
+        shell: bash
+        run: |
+          echo "Performing apax login..."
+          apax login --password ${{ secrets.APAX_TOKEN }}
+          apax login --registry https://npm.pkg.github.com/ --password ${{ secrets.GITHUB_TOKEN }}
             
       - name: Create .npmrc
         shell: bash
@@ -34,9 +48,11 @@ jobs:
       
       - name: Self-hosted Renovate
         shell: bash
-        run: renovate
+        run: renovate --autodiscover
         env:
           RENOVATE_CONFIG_FILE: "Global-Config/config.yml"
           LOG_LEVEL: "debug"
           RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RENOVATE_REPOSITORY_FILTER: ${{ github.event.inputs.repo }}
+          RENOVATE_REPOSITORY_FILTER: ${{ github.event.inputs.target-repo }}
+          RENOVATE_BASE_BRANCH_PATTERNS: ${{ github.event.inputs.target-branch }}
+          RENOVATE_DRY_RUN: "full"
