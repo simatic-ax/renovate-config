@@ -39,8 +39,8 @@ lockFileMaintenance:
   enabled: true
   schedule: ["before 4am on Monday"]
   branchTopic: "renovate/minor-patch-updates"
-  commitMessageAction: "Lock file maintenance"
-  prTitle: "chore(deps): Updates minor and patch versions in the apax-lock.json"
+  commitMessagePrefix: "chore(deps):"
+  commitMessageAction: "Updates minor and patch versions in the apax-lock.json"
   baseBranches: ["main", "release/*"]
 
 # post upgrade tasks for detecting minor/ patch updates in apax.yml and updating apax-lock.json
