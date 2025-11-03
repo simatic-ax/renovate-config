@@ -20,14 +20,11 @@ jobs:
   renovate:
     runs-on: ubuntu-24.04
     container: 
-        image: ghcr.io/simatic-ax/ci-images/apax-ci-image:4.1.1
+        image: ghcr.io/simatic-ax/ci-images/apax-ci-image:4.2.0
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install Renovate
-        run: npm install -g renovate@39.264.1
             
       - name: Login with apax
         shell: bash

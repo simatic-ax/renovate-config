@@ -4,6 +4,7 @@ onboarding: false
 requireConfig: true
 autodiscoverFilter: "simatic-ax/*"
 separateMajorMinor: false
+baseBranches: ["main", "release/*"]
 
 enabledManagers:
   - regex
