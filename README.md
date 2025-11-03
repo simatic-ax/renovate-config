@@ -1,101 +1,678 @@
 # Renovate configuration
 
-The [renovate CLI](https://docs.renovatebot.com/) can be used to automatically update dependencies in your project, once new versions of them have been released or whenever you see need.
+This repository contains the centralized Renovate configuration for all repositories within the SIMATIC AX GitHub organization. It provides automated dependency management through scheduled runs and manual triggers.
 
-To support the user in setting up the required infrastructure, two things are being offered:
-- A workflow that automatically detects and applies updates of a dependency
-  - The execution happens for all repositories within the SIMATIC AX GitHub organization
-  - Schedule: Once, every Sunday
-- A workflow that enables the maintainer of a repository to manually trigger the detection and application of dependency updates
+## Overview
 
-Once the Renovate bot discovered newly available versions of a dependency, it'll automatically set up a pull request wherein the updates have been applied. This supports the user in deciding if and when to update dependencies of a project.
+Renovate is configured to:
+- Automatically scan all repositories in the `simatic-ax` organization
+- Create pull requests for dependency updates based on defined rules
+- Support custom package managers and registries specific to SIMATIC AX
 
-## Incorporating the Renovate workflow in your own repository
+## Configuration Structure
 
-The Renovate workflow defined inside this repository can be reused inside workflows of other repositories. To do so, for any given repository, include a YML file inside the .github/workflows folder, containing at least the following declarations:
+### Core Configuration (`config.yml`)
 
-```yml
-name: my-renovate-call
+The main configuration file defines the following key properties:
 
-on:
-  *my_trigger*:
+#### Basic Settings
 
-jobs:
- my-renovate-call:
-    uses: ./.github/workflows/renovate-bot-run.yml
-    secrets: inherit
-    with:
-        renovate_reposetory_filter: "simatic-ax/*my_repository_name*"
+```yaml
+platform: "github"                    # Target platform
+gitAuthor: "simatic-ax-bot <...>"     # Author for commits and PRs
+onboarding: true                      # Enable onboarding for new repositories
+autodiscoverFilter: "simatic-ax/*"    # Repository discovery filter
+separateMajorMinor: false             # Group major and minor updates together
 ```
 
-This will configure a GitHub workflow, named my-renovate-call whose job simply references and executes the workflow provided by **THIS** repository to run the Renovate bot inside a CI pipeline of your own repository.
+#### Package Managers
 
-Further information on how to facilitate GitHub actions and workflows can be found [here](https://docs.github.com/en/actions).
+```yaml
+enabledManagers:
+  - regex                             # Enable regex-based custom manager
+```
 
-# General structure
+#### Registry Configuration
 
-- ./.github/workflows
-  - Contains the YML definition of the workflows
-- ./Global-Config
-  - Contains the default presets for the Renovate bot
-  - Contains a script to further configure the runtime environment of the bot
-- ./renovate.json
-  - Enables the general usage of a Renovate bot for the given repository
-The execution is carried out via the [renovate action](https://github.com/simatic-ax/renovate-config/blob/chore/set_up_renovate/.github/workflows/renovate.yml), which can be found in the .github\workflows folder.
+```yaml
+packageRules:
+  - matchPackagePrefixes:
+      - "@ax/"
+    registryUrls: 
+      - "https://registry.simatic-ax.siemens.io/"
+  - matchPackagePrefixes:
+      - "@simatic-ax"
+    registryUrls: 
+      - "https://npm.pkg.github.com/"
+```
 
-## Renovate workflows
+#### Update Branching Strategy
 
-### Automatic execution
+```yaml
+# Major updates go to main branch only
+- matchUpdateTypes:
+    - major
+  baseBranches:
+    - main
+  groupName: "all major dependencies"
 
-The automatic execution of the Renovate bot includes the following major steps:
-- Check out the repository which is to be updated
-- Configure the environment and install SIMATIC AX tooling, namely apax
-- Add the SIMATIC AX registry and the repositories to be updated
-- Pass the configuration files to the Renovate bot and start execution
+# Minor/patch updates go to both release/* and main branches
+- matchUpdateTypes:
+    - minor
+    - patch
+  baseBranches:
+    - release/*
+    - main
+  groupName: "all non-major dependencies"
+```
 
-### Manual execution
+#### Custom Managers
 
-The manual execution does the exact same thing, except it offers a button to the user to run the Renovate bot manually whenever required.
+```yaml
+customManagers:
+  - customType: regex
+    fileMatch:
+      - "apax.yml"
+    matchStrings:
+      - "['\"](?<depName>@(ax|simatic-ax|[a-z0-9\\-]+)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>[\\^~]\\d+\\.\\d+\\.\\d+(?:-[\\w\\d\\-.]+)?(?:\\+[\\w\\d\\-.]+)?)"
+    datasourceTemplate: npm
+```
 
-## Renovate configuration
+## Pull Request Creation Examples
 
-### Entry point
+### Scenario 1: Major Update
 
-The [renovate-entrypoint.sh](./Global-Config/renovate-entrypoint.sh) serves as an entry point for the Renovate bot. By adapting the file the user may control the installation of required prerequisites dependening on his own requirements. In its current implementation the script installs apax inside the image that is running the Renovate bot. This is required in order for the Renovate bot to communicate with the SIMATIC AX registry and check package versions.
+**Repository state:**
+- Current dependency: `@ax/system-commons: "1.5.2"`
+- Available version: `2.0.0`
 
-### Global configuration
+**Renovate behavior:**
+- Creates PR against `main` branch
+- PR title: "Update all major dependencies"
+- Groups all major updates in single PR
+- Branch name: `renovate/all-major-dependencies`
 
-The current configuration, which will be applied to the Renovate bot can be found inside the [renovate-global-config.js](./Global-Config/renovate-global-config.js).
+### Scenario 2: Minor/Patch Update
 
-The most important settings are:
-  - hostRules
-    - Tells the Renovate bot in which remote registry to lookup dependencies
-    - May be extended to include other package registries as well
-  - regexManagers
-    - Tells the Renovate bot which files to check for possible dependencies
-    - Tells the Renovate bot how to identify dependencies inside those files
-  - packageRules
-    - Tells the Renovate bot when and how to update the found dependencies
+**Repository state:**
+- Current dependency: `@simatic-ax/apax-build-helper: "1.2.0"`
+- Available version: `1.3.1`
 
-For more detailed information regarding the configuration, see the [official renovate documentation](https://docs.renovatebot.com/configuration-options/)
+**Renovate behavior:**
+- Creates PRs against both `main` and any `release/*` branches
+- PR title: "Update all non-major dependencies"
+- Groups all minor/patch updates together
+- Respects SemVer compatibility per branch
 
+### Scenario 3: New Repository Onboarding
 
-### Customizing and extending the configuration
+**Repository state:**
+- No `renovate.json` configuration file
+- Repository matches `simatic-ax/*` pattern
 
-One may either simply use the existing configuration, or extend it wherever necessary. In case you require additional parameterization of the Renovate bot, or in case you'd like to override an existing setting, adapt the [renovate.json](./renovate.json) inside your own repository. Once done, the set of settings to configure the bot will be an aggregation of the globally defined [renovate-global-config.js](./Global-Config/renovate-global-config.js) and the renovate.json file inside the respective repository.
+**Renovate behavior:**
+- Creates onboarding PR with title "Configure Renovate"
+- Adds basic `renovate.json` configuration
+- PR must be merged to enable ongoing dependency updates
 
-The following example of a renovate.json configuration will:
-  - extend the global configuration, such that a dashboard will be shown inside the update pull request
-  - overwrites the handling of minor and major version while updating.
+## Customization Points
+
+### 1. Repository-Level Configuration
+
+Create a `renovate.json` file in your repository root to override or extend the global configuration:
 
 ```json
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
   "separateMajorMinor": true,
-  "dependencyDashboard": true
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^@my-org/"],
+      "groupName": "My Organization packages"
+    }
+  ]
 }
 ```
 
-Further information on what and how to configure can be found [here](https://docs.renovatebot.com/configuration-options/)
+### 2. Additional Package Managers
 
-Note, that every single property of the global configuration could be altered this way, in case required.
+Extend the `enabledManagers` array to support additional package managers:
+
+```yaml
+enabledManagers:
+  - regex
+  - dockerfile
+  - github-actions
+```
+
+### 3. Custom Registry Rules
+
+Add new package rules for different registries:
+
+```yaml
+packageRules:
+  - matchPackagePrefixes:
+      - "@your-org/"
+    registryUrls: 
+      - "https://your-registry.com/"
+```
+
+### 4. Branch Strategy Customization
+
+Modify the branching strategy for different update types:
+
+```yaml
+packageRules:
+  - matchUpdateTypes:
+      - major
+    baseBranches:
+      - development
+    assignees: ["@team-lead"]
+```
+
+### 5. Custom File Pattern Matching
+
+Extend regex managers to support additional file formats:
+
+```yaml
+customManagers:
+  - customType: regex
+    fileMatch:
+      - "package.json"
+      - "requirements.txt"
+    matchStrings:
+      - "your-custom-pattern-here"
+```
+
+## Workflows
+
+This repository includes two main workflows for Renovate management:
+
+### 1. Renovate Bot Run (`renovate-bot-run.yml`)
+
+**Purpose:** Production Renovate execution across all SIMATIC AX repositories
+
+**Triggers:**
+- **Scheduled:** Every Sunday at 15:00 UTC
+- **Manual:** workflow_dispatch with target repository and branch selection
+
+**Behavior:**
+- **Scheduled runs:** Scans all repositories matching `autodiscoverFilter: "simatic-ax/*"` 
+- **Manual runs:** Targets specific repository and branch specified in inputs
+- Creates dependency update PRs according to the configuration
+- Handles onboarding for repositories without Renovate configuration
+- **Production mode:** Makes actual changes (creates real PRs)
+
+### 2. Configuration Validation (`validate-renovate-config.yml`)
+
+**Purpose:** Validates Renovate configuration syntax
+
+**Triggers:**
+- **Pull Requests:** When configuration files are changed
+- **Push to main:** When changes are merged to the main branch
+
+**Jobs:**
+- `validate-config`: Validates `config.yml` syntax and structure using `github-action-renovate-config-validator`
+
+**Features:**
+- Automatic syntax validation
+- Runs on configuration file changes only
+- Fast feedback for configuration errors
+
+## Usage
+
+### Testing Configuration Changes
+
+1. **Automatic Validation:** Configuration changes are automatically validated when you create a pull request
+2. **Manual Testing:** Use `act` for local testing:
+   ```bash
+   # Test configuration locally
+   act workflow_dispatch --secret-file .secrets --workflows .github/workflows/validate-renovate-config.yml
+   
+   # Test against specific repository
+   act workflow_dispatch --secret-file .secrets \
+     --input target-repo="simatic-ax/your-repo" \
+     --input target-branch="main"
+   ```
+
+### Production Updates
+
+- **Automatic:** Renovate runs every Sunday at 15:00 UTC across all SIMATIC AX repositories
+- **Manual:** Use workflow_dispatch to target specific repositories and branches
+
+## Workflow Triggers
+
+### Automatic Execution
+- **Schedule:** Every Sunday at 15:00 UTC  
+- **Scope:** All repositories matching `autodiscoverFilter`
+- **Trigger:** GitHub Actions cron schedule
+
+### Manual Execution
+- **Targeted Repository Testing:** `workflow_dispatch` with target-repo and target-branch parameters
+- **Validation:** Automatic on pull requests and pushes to main branch
+- **Use case:** On-demand updates for specific repositories and branches
+
+## Repository States and Behavior
+
+| Repository State | Renovate Behavior |
+|------------------|-------------------|
+| Has `renovate.json` | Regular dependency scanning and PR creation |
+| No configuration | Creates onboarding PR |
+| Onboarding PR closed/rejected | Repository ignored until PR is merged |
+| Contains supported files (`apax.yml`) | Scans for dependencies using custom managers |
+
+## Advanced Configuration Options
+
+### Grouping Strategies
+- **Default:** Groups by update type (major vs. non-major)
+- **Custom:** Define package-specific groups
+- **Monorepo:** Handle multiple packages in single repository
+
+### Security Updates
+- Automatic creation of security-focused PRs
+- Priority handling for vulnerability fixes
+- Integration with security scanning tools
+
+### Automerge Rules
+Configure automatic merging for specific update types:
+
+```json
+{
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch"],
+      "matchPackagePatterns": ["^@simatic-ax/"],
+      "automerge": true
+    }
+  ]
+}
+```
+
+For comprehensive configuration options, refer to the [official Renovate documentation](https://docs.renovatebot.com/configuration-options/).
+
+## Local Development and Testing
+
+### Prerequisites
+
+Before you can run Renovate workflows locally, ensure you have the following:
+
+1. **act** installed ([GitHub](https://github.com/nektos/act) - Tool for running GitHub Actions locally)
+2. **Docker** installed and running (required by act)
+3. **Access to required secrets:**
+   - `APAX_TOKEN` - Authentication token for SIMATIC AX registry
+   - `GITHUB_TOKEN` - GitHub personal access token with appropriate permissions
+
+### Installing act
+
+act can be easily installed via npm:
+
+```bash
+npm install -g @nektos/act
+```
+
+**Alternative installation methods:**
+- **Windows (Chocolatey):** `choco install act-cli`
+- **macOS (Homebrew):** `brew install act`
+- **Linux (curl):** `curl https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash`
+
+### Setting up Local Environment
+
+#### 1. Clone the Repository
+
+```bash
+git clone https://github.com/simatic-ax/renovate-config.git
+cd renovate-config
+```
+
+#### 2. Create Secrets File
+
+Create a `.secrets` file in the repository root with your secrets:
+
+```bash
+# .secrets (DO NOT COMMIT THIS FILE!)
+APAX_TOKEN=your_apax_token_here
+GITHUB_TOKEN=your_github_token_here
+```
+
+⚠️ **Important:** Add `.secrets` to your `.gitignore` to prevent accidental commits of sensitive data.
+
+#### 3. act Configuration
+
+The repository includes a `.actrc` file that pre-configures act with the necessary settings:
+- Platform mapping for ubuntu-24.04
+- Container architecture settings
+- Verbose output for debugging
+
+No additional act configuration is needed!
+
+### Running Renovate Locally with act
+
+#### Basic Workflow Execution
+
+To run the complete renovate workflow locally:
+
+```bash
+# Run the renovate workflow with secrets (.actrc provides default configuration)
+# WARNING: This runs in PRODUCTION mode and will create real PRs!
+act workflow_dispatch --secret-file .secrets
+
+# For testing, add dry-run mode
+act workflow_dispatch --secret-file .secrets --env RENOVATE_DRY_RUN=full
+```
+
+#### Testing Against Specific Repository
+
+To test against a specific repository (using workflow inputs):
+
+```bash
+# Test against a specific repository (PRODUCTION mode - creates real PRs!)
+act workflow_dispatch \
+  --secret-file .secrets \
+  --input target-repo="simatic-ax/your-target-repo" \
+  --input target-branch="main"
+
+# Test against a release branch with dry-run for safety
+act workflow_dispatch \
+  --secret-file .secrets \
+  --input target-repo="simatic-ax/your-target-repo" \
+  --input target-branch="release/v1.0" \
+  --env RENOVATE_DRY_RUN=full
+```
+
+#### PowerShell Helper Script
+
+Create a `run-renovate-act.ps1` script for easier usage:
+
+```powershell
+# run-renovate-act.ps1
+param(
+    [Parameter(Mandatory=$false)]
+    [string]$TargetRepo = "",
+    
+    [Parameter(Mandatory=$false)]
+    [string]$TargetBranch = "main",
+    
+    [Parameter(Mandatory=$false)]
+    [switch]$DryRun = $false,
+    
+    [Parameter(Mandatory=$false)]
+    [string]$Workflow = "renovate-bot-run"
+)
+
+# Verify .secrets file exists
+if (-not (Test-Path ".secrets")) {
+    Write-Error ".secrets file not found. Please create it with APAX_TOKEN and GITHUB_TOKEN"
+    exit 1
+}
+
+# Build act command (uses .actrc for configuration)
+$actCommand = @("act", "workflow_dispatch", "--secret-file", ".secrets")
+
+# Add workflow-specific arguments
+if ($Workflow -eq "renovate-bot-run") {
+    $actCommand += @("--workflows", ".github/workflows/renovate-bot-run.yml")
+}
+
+# Add repository and branch inputs if specified
+if ($TargetRepo) {
+    $actCommand += @("--input", "target-repo=$TargetRepo")
+    $actCommand += @("--input", "target-branch=$TargetBranch")
+}
+
+# Add dry-run environment variable if requested
+if ($DryRun) {
+    Write-Host "Running in DRY-RUN mode (no actual changes will be made)" -ForegroundColor Yellow
+    $actCommand += @("--env", "RENOVATE_DRY_RUN=full")
+} else {
+    Write-Host "Running in PRODUCTION mode (will make actual changes!)" -ForegroundColor Red
+}
+
+Write-Host "Executing: $($actCommand -join ' ')" -ForegroundColor Green
+& $actCommand[0] $actCommand[1..($actCommand.Length-1)]
+```
+
+Usage:
+```powershell
+# Run against all repositories (autodiscover mode) - PRODUCTION
+.\run-renovate-act.ps1
+
+# Test against specific repository and branch - PRODUCTION
+.\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo" -TargetBranch "release/v1.0"
+
+# Run in dry-run mode for testing
+.\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo" -DryRun
+
+# Run validation workflow
+.\run-renovate-act.ps1 -Workflow "validate-renovate-config"
+```
+
+#### Bash Helper Script
+
+Create a `run-renovate-act.sh` script:
+
+```bash
+#!/bin/bash
+# run-renovate-act.sh
+
+set -e
+
+# Default values
+TARGET_REPO=""
+TARGET_BRANCH="main"
+DRY_RUN=false
+WORKFLOW="renovate-bot-run"
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --repo)
+      TARGET_REPO="$2"
+      shift 2
+      ;;
+    --branch)
+      TARGET_BRANCH="$2"
+      shift 2
+      ;;
+    --workflow)
+      WORKFLOW="$2"
+      shift 2
+      ;;
+    --dry-run)
+      DRY_RUN=true
+      shift
+      ;;
+    *)
+      echo "Unknown option $1"
+      echo "Usage: $0 [--repo <repository>] [--branch <branch>] [--workflow <workflow>] [--dry-run]"
+      exit 1
+      ;;
+  esac
+done
+
+# Verify .secrets file exists
+if [[ ! -f .secrets ]]; then
+  echo "Error: .secrets file not found. Please create it with APAX_TOKEN and GITHUB_TOKEN"
+  exit 1
+fi
+
+# Build act command (uses .actrc for configuration)
+act_cmd=("act" "workflow_dispatch" "--secret-file" ".secrets")
+
+# Add workflow-specific arguments
+if [[ "$WORKFLOW" == "renovate-bot-run" ]]; then
+  act_cmd+=("--workflows" ".github/workflows/renovate-bot-run.yml")
+elif [[ "$WORKFLOW" == "validate-renovate-config" ]]; then
+  act_cmd+=("--workflows" ".github/workflows/validate-renovate-config.yml")
+fi
+
+# Add repository and branch inputs if specified
+if [[ -n "$TARGET_REPO" ]]; then
+  act_cmd+=("--input" "target-repo=$TARGET_REPO")
+  act_cmd+=("--input" "target-branch=$TARGET_BRANCH")
+fi
+
+# Add dry-run environment variable if requested
+if [[ "$DRY_RUN" == "true" ]]; then
+  echo "Running in DRY-RUN mode (no actual changes will be made)"
+  act_cmd+=("--env" "RENOVATE_DRY_RUN=full")
+else
+  echo "Running in PRODUCTION mode (will make actual changes!)"
+fi
+
+echo "Executing: ${act_cmd[*]}"
+"${act_cmd[@]}"
+```
+
+Usage:
+```bash
+chmod +x run-renovate-act.sh
+
+# Run against all repositories (autodiscover mode) - PRODUCTION
+./run-renovate-act.sh
+
+# Test against specific repository and branch - PRODUCTION
+./run-renovate-act.sh --repo "simatic-ax/your-repo" --branch "release/v1.0"
+
+# Run in dry-run mode for testing
+./run-renovate-act.sh --repo "simatic-ax/your-repo" --dry-run
+
+# Run validation workflow
+./run-renovate-act.sh --workflow "validate-renovate-config"
+```
+```
+
+Usage:
+```bash
+chmod +x run-renovate-local.sh
+
+# Test against specific repository and branch
+./run-renovate-local.sh --repo "simatic-ax/your-repo" --branch "renovate-test-branch"
+
+# Test with trace logging
+./run-renovate-local.sh --repo "simatic-ax/your-repo" --log-level "trace"
+```
+
+### Common Development Scenarios
+
+#### 1. Testing Configuration Changes
+
+After modifying `Global-Config/config.yml`:
+
+```bash
+# Validate configuration syntax
+act workflow_dispatch --secret-file .secrets --workflows .github/workflows/validate-renovate-config.yml
+```
+
+#### 2. Testing Against Specific Repository
+
+```bash
+# Test against a specific repository and branch
+act workflow_dispatch --secret-file .secrets \
+  --input target-repo="simatic-ax/your-repo" \
+  --input target-branch="main"
+```
+
+#### 3. Testing Lockfile Maintenance
+
+To specifically test lockfile maintenance behavior:
+
+```bash
+# Run workflow against repository with apax.yml files
+act workflow_dispatch --secret-file .secrets \
+  --input target-repo="simatic-ax/your-repo" \
+  --input target-branch="main"
+```
+
+### Advanced act Usage
+
+#### Running with Custom Event Data
+
+Create an `event.json` file for more complex testing:
+
+```json
+{
+  "inputs": {
+    "target-repo": "simatic-ax/your-target-repo",
+    "target-branch": "release/v1.0"
+  }
+}
+```
+
+Then run:
+```bash
+act workflow_dispatch --secret-file .secrets --eventpath event.json
+```
+
+#### Using Different Docker Images
+
+If you want to use a different runner image:
+
+```bash
+# Use a specific Ubuntu image
+act --secret-file .secrets -P ubuntu-24.04=ubuntu:24.04
+```
+
+#### Verbose Logging
+
+For detailed debugging information:
+
+```bash
+# Enable verbose logging
+act workflow_dispatch --secret-file .secrets --verbose
+```
+
+### Debugging Tips
+
+1. **act Specific Issues:**
+   - Use `--dryrun` to see what act would do without executing
+   - Use `--list` to see available workflows and jobs
+   - Use `--verbose` for detailed execution logs
+
+2. **Common act Problems:**
+   - **Docker image issues:** act will automatically pull required images
+   - **Secret access:** Ensure `.secrets` file format is correct (KEY=VALUE)
+   - **Workflow triggers:** Make sure you're using the correct trigger event
+
+3. **Useful act Commands:**
+   ```bash
+   # List all workflows
+   act --list
+   
+   # Dry run to see execution plan
+   act workflow_dispatch --secret-file .secrets --dryrun
+   
+   # Run specific job only
+   act workflow_dispatch --secret-file .secrets --job renovate
+   ```
+
+### Benefits of Using act
+
+✅ **Advantages over manual Docker execution:**
+- Runs the exact same environment as GitHub Actions
+- Automatically handles workflow steps and dependencies
+- Built-in secret management
+- No need to manually compose complex Docker commands
+- Easy to test workflow changes before pushing
+
+✅ **Perfect for:**
+- Testing workflow modifications
+- Validating Renovate configuration changes
+- Debugging failed GitHub Actions locally
+- Development iteration without pushing commits
+
+### Security Considerations
+
+- Never commit `.env` files or secrets to version control
+- Use temporary tokens for local development when possible
+- Regularly rotate your development tokens
+- Consider using GitHub CLI authentication instead of manual token management
+
+⚠️ **Important:** The default mode is **PRODUCTION** - renovate will create real PRs! Use `--dry-run` flag for testing.
+
+```bash
+# Alternative: Use GitHub CLI for authentication
+gh auth login
+export GITHUB_TOKEN=$(gh auth token)
+```

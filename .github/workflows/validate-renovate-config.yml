@@ -1,0 +1,28 @@
+name: Validate Renovate Configuration
+
+on:
+  # Läuft bei Pull Requests auf Konfigurationsänderungen
+  pull_request:
+    paths:
+      - 'Global-Config/**'
+      - '.github/workflows/**'
+  
+  # Läuft bei Push auf main Branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'Global-Config/**'
+      - '.github/workflows/**'
+
+jobs:
+  validate-config:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Validate Renovate Configuration
+        uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.0.1
+        with:
+          config_file_path: Global-Config/config.yml

@@ -1,0 +1,74 @@
+# Global Renovate configuration
+platform: "github"
+gitAuthor: "simatic-ax-bot <ax-public@gmx.de>"
+onboarding: false
+requireConfig: true
+autodiscoverFilter: "simatic-ax/*"
+separateMajorMinor: false
+baseBranches: ["main", "release/*"]
+
+# Enable regex manager for custom dependency detection
+enabledManagers:
+  - regex
+
+# Package-specific rules for registry URLs and update strategies
+packageRules:
+  # Registry URL for @ax/ packages
+  - matchPackagePrefixes:
+      - "@ax/"
+    registryUrls: 
+      - "https://registry.simatic-ax.siemens.io/"
+  # Registry URL for @simatic-ax packages
+  - matchPackagePrefixes:
+      - "@simatic-ax"
+    registryUrls: 
+      - "https://npm.pkg.github.com/"
+  # Major updates only on main branch
+  - matchUpdateTypes:
+      - major
+    baseBranches:
+      - main
+    groupName: "Update dependencies to latest major version"
+  # Minor and patch updates on all branches (main and release/*)
+  - matchUpdateTypes:
+      - minor
+      - patch
+    baseBranches:
+      - release/*
+      - main
+    groupName: "Update dependencies to latest minor or patch version"
+  # Bump version range for regex-managed dependencies
+  - matchManagers:
+      - regex
+    matchCurrentVersion: \^\d+\.\d+\.\d+
+    rangeStrategy: bump
+
+# Lockfile maintenance: updates lockfile to resolve minor/patch changes
+lockFileMaintenance:
+  enabled: true
+  schedule: ["before 4am on Monday"]
+  branchTopic: "renovate/minor-patch-updates"
+  commitMessagePrefix: "chore(deps):"
+  commitMessageAction: "Updates minor and patch versions in the apax-lock.json"
+  baseBranches: ["main", "release/*"]
+
+# Post-upgrade tasks: regenerate apax-lock.json after dependency updates
+postUpgradeTasks:
+  commands:
+    # remove the existing lockfile to ensure a fresh one is created
+    # apax would fall back to the existing lockfile if it exists and could not detect updates
+    - "rm -f apax-lock.json"
+    - "apax install"
+  fileFilters:
+    - "apax-lock.json"
+  executionMode: "update"
+
+# Custom manager: regex-based dependency detection in apax.yml
+customManagers:
+  - customType: regex
+    fileMatch:
+      - "apax.yml"
+    matchStrings:
+      - "['\"](?<depName>@(ax|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+)"
+    datasourceTemplate: npm
+
