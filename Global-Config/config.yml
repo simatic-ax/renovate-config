@@ -52,6 +52,11 @@ lockFileMaintenance:
   commitMessageAction: "Updates minor and patch versions in the apax-lock.json"
   baseBranches: ["main", "release/*"]
 
+# Allow specific commands for post-upgrade tasks
+allowedCommands:
+  - "rm"
+  - "apax"
+
 # Post-upgrade tasks: regenerate apax-lock.json after dependency updates
 postUpgradeTasks:
   commands:
