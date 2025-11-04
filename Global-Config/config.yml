@@ -28,7 +28,7 @@ packageRules:
       - major
     baseBranches:
       - main
-    groupName: "Update dependencies to latest major version"
+    groupName: "major dependencies"
   # Minor and patch updates on all branches (main and release/*)
   - matchUpdateTypes:
       - minor
@@ -36,7 +36,7 @@ packageRules:
     baseBranches:
       - release/*
       - main
-    groupName: "Update dependencies to latest minor or patch version"
+    groupName: "non-major dependencies"
   # Bump version range for regex-managed dependencies
   - matchManagers:
       - regex
