@@ -11,9 +11,10 @@ on:
         required: true
         type: string
       target-branch:
-        description: 'Pick a specific branch to execute renovate on (e.g. main, release/*)'
-        required: true
+        description: 'Pick a specific branch to execute renovate on (leave empty for default: main, release/*)'
+        required: false
         type: string
+        default: ''
       
 
 jobs:
@@ -46,6 +47,15 @@ jobs:
       - name: Self-hosted Renovate
         shell: bash
         run: |
+          # Set base branches if provided via manual trigger
+          if [ -n "${{ github.event.inputs.target-branch }}" ]; then
+            export RENOVATE_BASE_BRANCHES="${{ github.event.inputs.target-branch }}"
+            echo "Using custom base branch(es): $RENOVATE_BASE_BRANCHES"
+          else
+            echo "Using default base branches from config.yml"
+          fi
+          
+          # Run renovate on specific repo or autodiscover
           if [ -n "${{ github.event.inputs.target-repo }}" ]; then
             echo "Running Renovate for specific repository: ${{ github.event.inputs.target-repo }}"
             renovate ${{ github.event.inputs.target-repo }}
@@ -57,5 +67,4 @@ jobs:
           RENOVATE_CONFIG_FILE: "Global-Config/config.yml"
           LOG_LEVEL: "debug"
           RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
-          RENOVATE_BASE_BRANCHES: ${{ github.event.inputs.target-branch }}
           # RENOVATE_DRY_RUN: "full"
