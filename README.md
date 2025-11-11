@@ -20,9 +20,11 @@ The main configuration file defines the following key properties:
 ```yaml
 platform: "github"                    # Target platform
 gitAuthor: "simatic-ax-bot <...>"     # Author for commits and PRs
-onboarding: true                      # Enable onboarding for new repositories
+onboarding: false                     # Disable onboarding (use requireConfig instead)
+requireConfig: true                   # Require renovate.json in repositories
 autodiscoverFilter: "simatic-ax/*"    # Repository discovery filter
 separateMajorMinor: false             # Group major and minor updates together
+baseBranches: ["main", "release/*"]   # Default branches to scan (can be overridden)
 ```
 
 #### Package Managers
@@ -54,7 +56,7 @@ packageRules:
     - major
   baseBranches:
     - main
-  groupName: "all major dependencies"
+  groupName: "major dependencies"
 
 # Minor/patch updates go to both release/* and main branches
 - matchUpdateTypes:
@@ -63,7 +65,7 @@ packageRules:
   baseBranches:
     - release/*
     - main
-  groupName: "all non-major dependencies"
+  groupName: "non-major dependencies"
 ```
 
 #### Custom Managers
@@ -74,7 +76,7 @@ customManagers:
     fileMatch:
       - "apax.yml"
     matchStrings:
-      - "['\"](?<depName>@(ax|simatic-ax|[a-z0-9\\-]+)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>[\\^~]\\d+\\.\\d+\\.\\d+(?:-[\\w\\d\\-.]+)?(?:\\+[\\w\\d\\-.]+)?)"
+      - "['\"](?<depName>@(ax|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+)"
     datasourceTemplate: npm
 ```
 
@@ -88,9 +90,9 @@ customManagers:
 
 **Renovate behavior:**
 - Creates PR against `main` branch
-- PR title: "Update all major dependencies"
+- PR title: "chore(deps): update major dependencies"
 - Groups all major updates in single PR
-- Branch name: `renovate/all-major-dependencies`
+- Branch name: `renovate/major-dependencies`
 
 ### Scenario 2: Minor/Patch Update
 
@@ -100,20 +102,26 @@ customManagers:
 
 **Renovate behavior:**
 - Creates PRs against both `main` and any `release/*` branches
-- PR title: "Update all non-major dependencies"
+- PR title: "chore(deps): update non-major dependencies"
 - Groups all minor/patch updates together
 - Respects SemVer compatibility per branch
 
-### Scenario 3: New Repository Onboarding
+### Scenario 3: Repository without Renovate Configuration
 
 **Repository state:**
 - No `renovate.json` configuration file
 - Repository matches `simatic-ax/*` pattern
+- `requireConfig: true` is set in global config
 
 **Renovate behavior:**
-- Creates onboarding PR with title "Configure Renovate"
-- Adds basic `renovate.json` configuration
-- PR must be merged to enable ongoing dependency updates
+- Repository is **skipped** (no onboarding PR created)
+- Requires manual creation of `renovate.json` to enable Renovate
+- Use the minimal configuration to get started:
+  ```json
+  {
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json"
+  }
+  ```
 
 ## Customization Points
 
@@ -196,13 +204,18 @@ This repository includes two main workflows for Renovate management:
 
 **Triggers:**
 - **Scheduled:** Every Sunday at 15:00 UTC
-- **Manual:** workflow_dispatch with target repository and branch selection
+- **Manual:** workflow_dispatch with optional target repository and branch selection
+
+**Inputs (Manual Trigger Only):**
+- `target-repo` (required): Specific repository to scan (e.g., `simatic-ax/your-repo`)
+- `target-branch` (optional): Specific branch to scan (defaults to `main, release/*` if empty)
 
 **Behavior:**
-- **Scheduled runs:** Scans all repositories matching `autodiscoverFilter: "simatic-ax/*"` 
-- **Manual runs:** Targets specific repository and branch specified in inputs
+- **Scheduled runs:** Scans all repositories matching `autodiscoverFilter: "simatic-ax/*"` using default branches from config
+- **Manual runs (with target-repo):** 
+  - Scans specified repository
+  - Uses `target-branch` if provided, otherwise defaults to config branches (`main, release/*`)
 - Creates dependency update PRs according to the configuration
-- Handles onboarding for repositories without Renovate configuration
 - **Production mode:** Makes actual changes (creates real PRs)
 
 ### 2. Configuration Validation (`validate-renovate-config.yml`)
@@ -239,8 +252,11 @@ This repository includes two main workflows for Renovate management:
 
 ### Production Updates
 
-- **Automatic:** Renovate runs every Sunday at 15:00 UTC across all SIMATIC AX repositories
-- **Manual:** Use workflow_dispatch to target specific repositories and branches
+- **Automatic:** Renovate runs every Sunday at 15:00 UTC across all SIMATIC AX repositories using default branches
+- **Manual Targeting:** Use workflow_dispatch to:
+  - Target a specific repository
+  - Test on a custom branch (e.g., feature branch, test branch)
+  - Leave `target-branch` empty to use default branches (`main, release/*`)
 
 ## Workflow Triggers
 
@@ -250,17 +266,20 @@ This repository includes two main workflows for Renovate management:
 - **Trigger:** GitHub Actions cron schedule
 
 ### Manual Execution
-- **Targeted Repository Testing:** `workflow_dispatch` with target-repo and target-branch parameters
+- **Targeted Repository Testing:** `workflow_dispatch` with `target-repo` (required) and optional `target-branch` parameters
+- **Branch Selection:**
+  - Leave `target-branch` empty: Uses default branches from config (`main, release/*`)
+  - Specify `target-branch`: Overrides config to scan only specified branch (e.g., `feature/test-renovate`)
 - **Validation:** Automatic on pull requests and pushes to main branch
-- **Use case:** On-demand updates for specific repositories and branches
+- **Use case:** On-demand updates, testing on feature branches, or scanning specific release branches
 
 ## Repository States and Behavior
 
 | Repository State | Renovate Behavior |
 |------------------|-------------------|
 | Has `renovate.json` | Regular dependency scanning and PR creation |
-| No configuration | Creates onboarding PR |
-| Onboarding PR closed/rejected | Repository ignored until PR is merged |
+| No configuration + `requireConfig: true` | Repository is skipped (manual config required) |
+| No configuration + `onboarding: true` | Creates onboarding PR (not used in this setup) |
 | Contains supported files (`apax.yml`) | Scans for dependencies using custom managers |
 
 ## Advanced Configuration Options
@@ -367,17 +386,22 @@ act workflow_dispatch --secret-file .secrets --env RENOVATE_DRY_RUN=full
 To test against a specific repository (using workflow inputs):
 
 ```bash
-# Test against a specific repository (PRODUCTION mode - creates real PRs!)
+# Test against a specific repository with default branches (main, release/*)
+act workflow_dispatch \
+  --secret-file .secrets \
+  --input target-repo="simatic-ax/your-target-repo"
+
+# Test against a specific repository and custom branch (PRODUCTION mode - creates real PRs!)
 act workflow_dispatch \
   --secret-file .secrets \
   --input target-repo="simatic-ax/your-target-repo" \
   --input target-branch="main"
 
-# Test against a release branch with dry-run for safety
+# Test against a feature branch with dry-run for safety
 act workflow_dispatch \
   --secret-file .secrets \
   --input target-repo="simatic-ax/your-target-repo" \
-  --input target-branch="release/v1.0" \
+  --input target-branch="feature/test-renovate" \
   --env RENOVATE_DRY_RUN=full
 ```
 
@@ -392,7 +416,7 @@ param(
     [string]$TargetRepo = "",
     
     [Parameter(Mandatory=$false)]
-    [string]$TargetBranch = "main",
+    [string]$TargetBranch = "",
     
     [Parameter(Mandatory=$false)]
     [switch]$DryRun = $false,
@@ -418,7 +442,9 @@ if ($Workflow -eq "renovate-bot-run") {
 # Add repository and branch inputs if specified
 if ($TargetRepo) {
     $actCommand += @("--input", "target-repo=$TargetRepo")
-    $actCommand += @("--input", "target-branch=$TargetBranch")
+    if ($TargetBranch) {
+        $actCommand += @("--input", "target-branch=$TargetBranch")
+    }
 }
 
 # Add dry-run environment variable if requested
@@ -438,11 +464,17 @@ Usage:
 # Run against all repositories (autodiscover mode) - PRODUCTION
 .\run-renovate-act.ps1
 
+# Test against specific repository with default branches - PRODUCTION
+.\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo"
+
 # Test against specific repository and branch - PRODUCTION
 .\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo" -TargetBranch "release/v1.0"
 
 # Run in dry-run mode for testing
 .\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo" -DryRun
+
+# Test on feature branch with dry-run
+.\run-renovate-act.ps1 -TargetRepo "simatic-ax/your-repo" -TargetBranch "feature/test" -DryRun
 
 # Run validation workflow
 .\run-renovate-act.ps1 -Workflow "validate-renovate-config"
@@ -460,7 +492,7 @@ set -e
 
 # Default values
 TARGET_REPO=""
-TARGET_BRANCH="main"
+TARGET_BRANCH=""
 DRY_RUN=false
 WORKFLOW="renovate-bot-run"
 
@@ -510,7 +542,9 @@ fi
 # Add repository and branch inputs if specified
 if [[ -n "$TARGET_REPO" ]]; then
   act_cmd+=("--input" "target-repo=$TARGET_REPO")
-  act_cmd+=("--input" "target-branch=$TARGET_BRANCH")
+  if [[ -n "$TARGET_BRANCH" ]]; then
+    act_cmd+=("--input" "target-branch=$TARGET_BRANCH")
+  fi
 fi
 
 # Add dry-run environment variable if requested
@@ -532,26 +566,21 @@ chmod +x run-renovate-act.sh
 # Run against all repositories (autodiscover mode) - PRODUCTION
 ./run-renovate-act.sh
 
+# Test against specific repository with default branches - PRODUCTION
+./run-renovate-act.sh --repo "simatic-ax/your-repo"
+
 # Test against specific repository and branch - PRODUCTION
 ./run-renovate-act.sh --repo "simatic-ax/your-repo" --branch "release/v1.0"
 
 # Run in dry-run mode for testing
 ./run-renovate-act.sh --repo "simatic-ax/your-repo" --dry-run
 
+# Test on feature branch with dry-run
+./run-renovate-act.sh --repo "simatic-ax/your-repo" --branch "feature/test" --dry-run
+
 # Run validation workflow
 ./run-renovate-act.sh --workflow "validate-renovate-config"
 ```
-```
-
-Usage:
-```bash
-chmod +x run-renovate-local.sh
-
-# Test against specific repository and branch
-./run-renovate-local.sh --repo "simatic-ax/your-repo" --branch "renovate-test-branch"
-
-# Test with trace logging
-./run-renovate-local.sh --repo "simatic-ax/your-repo" --log-level "trace"
 ```
 
 ### Common Development Scenarios
@@ -568,10 +597,14 @@ act workflow_dispatch --secret-file .secrets --workflows .github/workflows/valid
 #### 2. Testing Against Specific Repository
 
 ```bash
-# Test against a specific repository and branch
+# Test against a specific repository with default branches
+act workflow_dispatch --secret-file .secrets \
+  --input target-repo="simatic-ax/your-repo"
+
+# Test against a specific repository and custom branch
 act workflow_dispatch --secret-file .secrets \
   --input target-repo="simatic-ax/your-repo" \
-  --input target-branch="main"
+  --input target-branch="feature/test-renovate"
 ```
 
 #### 3. Testing Lockfile Maintenance
@@ -579,7 +612,11 @@ act workflow_dispatch --secret-file .secrets \
 To specifically test lockfile maintenance behavior:
 
 ```bash
-# Run workflow against repository with apax.yml files
+# Run workflow against repository with apax.yml files using default branches
+act workflow_dispatch --secret-file .secrets \
+  --input target-repo="simatic-ax/your-repo"
+  
+# Test lockfile maintenance on a specific branch
 act workflow_dispatch --secret-file .secrets \
   --input target-repo="simatic-ax/your-repo" \
   --input target-branch="main"
