@@ -5,6 +5,7 @@ onboarding: false
 requireConfig: true
 autodiscoverFilter: "simatic-ax/*"
 separateMajorMinor: false
+# Default branches to scan - can be overridden via RENOVATE_BASE_BRANCHES env var
 baseBranches: ["main", "release/*"]
 
 # Enable regex manager for custom dependency detection
