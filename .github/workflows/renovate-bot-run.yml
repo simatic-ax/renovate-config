@@ -46,6 +46,13 @@ jobs:
       
       - name: Self-hosted Renovate
         shell: bash
+        env:
+          RENOVATE_CONFIG_FILE: "Global-Config/config.yml"
+          LOG_LEVEL: "debug"
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+          TARGET_REPO: ${{ github.event.inputs.target-repo }}
+          TARGET_BRANCH: ${{ github.event.inputs.target-branch }}
+          # RENOVATE_DRY_RUN: "full"
         run: |
           # Set base branches if provided via manual trigger
           if [ -n "$TARGET_BRANCH" ]; then
@@ -63,10 +70,3 @@ jobs:
             echo "Running Renovate in autodiscover mode"
             renovate --autodiscover
           fi
-        env:
-          RENOVATE_CONFIG_FILE: "Global-Config/config.yml"
-          LOG_LEVEL: "debug"
-          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
-          TARGET_REPO: ${{ github.event.inputs.target-repo }}
-          TARGET_BRANCH: ${{ github.event.inputs.target-branch }}
-          # RENOVATE_DRY_RUN: "full"
