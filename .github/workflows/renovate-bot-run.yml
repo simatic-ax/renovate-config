@@ -48,17 +48,17 @@ jobs:
         shell: bash
         run: |
           # Set base branches if provided via manual trigger
-          if [ -n "${{ github.event.inputs.target-branch }}" ]; then
-            export RENOVATE_BASE_BRANCHES="${{ github.event.inputs.target-branch }}"
+          if [ -n "$TARGET_BRANCH" ]; then
+            export RENOVATE_BASE_BRANCHES="$TARGET_BRANCH"
             echo "Using custom base branch(es): $RENOVATE_BASE_BRANCHES"
           else
             echo "Using default base branches from config.yml"
           fi
           
           # Run renovate on specific repo or autodiscover
-          if [ -n "${{ github.event.inputs.target-repo }}" ]; then
-            echo "Running Renovate for specific repository: ${{ github.event.inputs.target-repo }}"
-            renovate ${{ github.event.inputs.target-repo }}
+          if [ -n "$TARGET_REPO" ]; then
+            echo "Running Renovate for specific repository: $TARGET_REPO"
+            renovate "$TARGET_REPO"
           else
             echo "Running Renovate in autodiscover mode"
             renovate --autodiscover
@@ -67,4 +67,6 @@ jobs:
           RENOVATE_CONFIG_FILE: "Global-Config/config.yml"
           LOG_LEVEL: "debug"
           RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+          TARGET_REPO: ${{ github.event.inputs.target-repo }}
+          TARGET_BRANCH: ${{ github.event.inputs.target-branch }}
           # RENOVATE_DRY_RUN: "full"
