@@ -5,12 +5,12 @@ onboarding: false
 requireConfig: true
 autodiscoverFilter: "simatic-ax/*"
 separateMajorMinor: false
-# Default branches to scan - can be overridden via RENOVATE_BASE_BRANCHES env var
-baseBranches: ["main", "release/*"]
+# Default branches to scan - can be overridden via RENOVATE_BASE_BRANCH_PATTERNS env var
+baseBranchPatterns: ["main", "release/*"]
 
 # Enable regex manager for custom dependency detection
 enabledManagers:
-  - regex
+  - custom.regex
 
 # Package-specific rules for registry URLs and update strategies
 packageRules:
@@ -27,15 +27,15 @@ packageRules:
   # Major updates only on main branch
   - matchUpdateTypes:
       - major
-    baseBranches:
+    matchBaseBranches:
       - main
     groupName: "major dependencies"
   # Minor and patch updates on all branches (main and release/*)
   - matchUpdateTypes:
       - minor
       - patch
-    baseBranches:
-      - release/*
+    matchBaseBranches:
+      - /^release\/.*/
       - main
     groupName: "non-major dependencies"
   # Bump version range for regex-managed dependencies
@@ -51,7 +51,7 @@ lockFileMaintenance:
   branchTopic: "renovate/minor-patch-updates"
   commitMessagePrefix: "chore(deps):"
   commitMessageAction: "Updates minor and patch versions in the apax-lock.json"
-  baseBranches: ["main", "release/*"]
+  baseBranchPatterns: ["main", "release/*"]
 
 # Allow specific commands for post-upgrade tasks
 allowedCommands:
@@ -72,7 +72,7 @@ postUpgradeTasks:
 # Custom manager: regex-based dependency detection in apax.yml
 customManagers:
   - customType: regex
-    fileMatch:
+    managerFilePatterns:
       - "apax.yml"
     matchStrings:
       - "['\"](?<depName>@(ax|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+)"
