@@ -44,6 +44,37 @@ jobs:
           echo "$NPMRC_CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
       
+      - name: Test ghcr.io token auth
+        shell: bash
+        env:
+          RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
+        run: |
+          echo "=== Testing ghcr.io token auth (same flow as Renovate) ==="
+          AUTH=$(echo -n "simatic-ax-bot:${RENOVATE_TOKEN}" | base64)
+          echo "Requesting bearer token from ghcr.io..."
+          HTTP_CODE=$(curl -s -o /tmp/token_response.json -w "%{http_code}" \
+            -H "Authorization: Basic ${AUTH}" \
+            "https://ghcr.io/token?scope=repository:simatic-ax/ci-images/apax-ci-image:pull&service=ghcr.io")
+          echo "Token endpoint HTTP status: ${HTTP_CODE}"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Token request failed with HTTP ${HTTP_CODE}"
+            cat /tmp/token_response.json
+            echo ""
+            echo "--- Retrying with username 'theBadT' ---"
+            AUTH2=$(echo -n "theBadT:${RENOVATE_TOKEN}" | base64)
+            HTTP_CODE2=$(curl -s -o /tmp/token_response2.json -w "%{http_code}" \
+              -H "Authorization: Basic ${AUTH2}" \
+              "https://ghcr.io/token?scope=repository:simatic-ax/ci-images/apax-ci-image:pull&service=ghcr.io")
+            echo "Token endpoint HTTP status (theBadT): ${HTTP_CODE2}"
+            cat /tmp/token_response2.json
+          else
+            echo "Token request successful!"
+            BEARER=$(jq -r '.token' /tmp/token_response.json)
+            echo "Fetching tags..."
+            curl -s -H "Authorization: Bearer ${BEARER}" \
+              "https://ghcr.io/v2/simatic-ax/ci-images/apax-ci-image/tags/list" | jq .
+          fi
+
       - name: Self-hosted Renovate
         shell: bash
         env:
