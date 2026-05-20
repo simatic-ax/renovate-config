@@ -16,7 +16,7 @@ ignoreDeps:
 hostRules:
   - matchHost: ghcr.io
     hostType: docker
-    username: x-access-token
+    username: simatic-ax-bot
     password: "${RENOVATE_TOKEN}"
 
 # Enable managers for custom dependency detection
