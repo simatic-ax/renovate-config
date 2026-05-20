@@ -69,10 +69,10 @@ jobs:
             cat /tmp/token_response2.json
           else
             echo "Token request successful!"
-            BEARER=$(jq -r '.token' /tmp/token_response.json)
+            BEARER=$(python3 -c "import json; print(json.load(open('/tmp/token_response.json'))['token'])")
             echo "Fetching tags..."
             curl -s -H "Authorization: Bearer ${BEARER}" \
-              "https://ghcr.io/v2/simatic-ax/ci-images/apax-ci-image/tags/list" | jq .
+              "https://ghcr.io/v2/simatic-ax/ci-images/apax-ci-image/tags/list" | python3 -m json.tool
           fi
 
       - name: Self-hosted Renovate
