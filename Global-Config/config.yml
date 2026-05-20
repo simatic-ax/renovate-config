@@ -13,11 +13,8 @@ ignoreDeps:
   - simatic-ax/internal-actions
 
 # Host-specific credentials for private registries
-hostRules:
-  - matchHost: ghcr.io
-    hostType: docker
-    username: simatic-ax-bot
-    password: "${RENOVATE_TOKEN}"
+# NOTE: ghcr.io hostRule is set via RENOVATE_HOST_RULES env var in the workflow
+# because YAML config does not resolve environment variables in values
 
 # Enable managers for custom dependency detection
 enabledManagers:
