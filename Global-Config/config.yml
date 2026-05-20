@@ -8,9 +8,10 @@ separateMajorMinor: false
 # Default branches to scan - can be overridden via RENOVATE_BASE_BRANCHES env var
 baseBranches: ["main", "release/*"]
 
-# Enable regex manager for custom dependency detection
+# Enable managers for custom dependency detection
 enabledManagers:
   - regex
+  - github-actions
 
 # Package-specific rules for registry URLs and update strategies
 packageRules:
@@ -43,6 +44,27 @@ packageRules:
       - regex
     matchCurrentVersion: \^\d+\.\d+\.\d+
     rangeStrategy: bump
+  # Group simatic-ax GitHub Actions together
+  - matchManagers:
+      - github-actions
+    matchPackagePrefixes:
+      - "simatic-ax/"
+    groupName: "simatic-ax actions"
+  # Group third-party GitHub Actions together
+  - matchManagers:
+      - github-actions
+    matchPackagePrefixes:
+      - "actions/"
+      - "gaurav-nelson/"
+    groupName: "third-party actions"
+  # Docker images from simatic-ax CI
+  - matchManagers:
+      - github-actions
+    matchDatasources:
+      - docker
+    matchPackagePrefixes:
+      - "ghcr.io/simatic-ax/"
+    groupName: "simatic-ax docker images"
 
 # Lockfile maintenance: updates lockfile to resolve minor/patch changes
 lockFileMaintenance:

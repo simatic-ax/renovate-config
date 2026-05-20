@@ -52,7 +52,7 @@ jobs:
           RENOVATE_TOKEN: ${{ secrets.RENOVATE_TOKEN }}
           TARGET_REPO: ${{ github.event.inputs.target-repo }}
           TARGET_BRANCH: ${{ github.event.inputs.target-branch }}
-          # RENOVATE_DRY_RUN: "full"
+          RENOVATE_DRY_RUN: "full"
         run: |
           # Set base branches if provided via manual trigger
           if [ -n "$TARGET_BRANCH" ]; then
