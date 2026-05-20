@@ -53,7 +53,7 @@ jobs:
           RENOVATE_HOST_RULES: '[{"matchHost": "ghcr.io", "hostType": "docker", "username": "simatic-ax-bot", "password": "${{ secrets.RENOVATE_TOKEN }}"}]'
           TARGET_REPO: ${{ github.event.inputs.target-repo }}
           TARGET_BRANCH: ${{ github.event.inputs.target-branch }}
-          RENOVATE_DRY_RUN: "full"
+          # RENOVATE_DRY_RUN: "full"
         run: |
           # Set base branches if provided via manual trigger
           if [ -n "$TARGET_BRANCH" ]; then
