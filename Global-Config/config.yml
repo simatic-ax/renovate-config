@@ -8,6 +8,17 @@ separateMajorMinor: false
 # Default branches to scan - can be overridden via RENOVATE_BASE_BRANCHES env var
 baseBranches: ["main", "release/*"]
 
+# Dependencies that cannot be resolved (e.g. hosted on separate Enterprise instance)
+ignoreDeps:
+  - simatic-ax/internal-actions
+
+# Host-specific credentials for private registries
+hostRules:
+  - matchHost: ghcr.io
+    hostType: docker
+    username: x-access-token
+    password: "${RENOVATE_TOKEN}"
+
 # Enable managers for custom dependency detection
 enabledManagers:
   - regex
