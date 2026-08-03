@@ -5,6 +5,10 @@ onboarding: false
 requireConfig: "required"
 autodiscoverFilter: "simatic-ax/*"
 separateMajorMinor: false
+# Rate limits: bot runs weekly in batch mode, so we want all detected updates
+# to be raised as PRs in a single run. Disable the hourly PR cap (default: 2)
+# while keeping the concurrent-PR safety net (default: 10) in place.
+prHourlyLimit: 0
 # Default branches to scan - can be overridden via RENOVATE_BASE_BRANCHES env var.
 # Regex patterns must be enclosed in slashes (/.../).
 baseBranchPatterns: ["main", "/^release\\/.*/"]
