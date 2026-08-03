@@ -2,11 +2,12 @@
 platform: "github"
 gitAuthor: "simatic-ax-bot <ax-public@gmx.de>"
 onboarding: false
-requireConfig: true
+requireConfig: "required"
 autodiscoverFilter: "simatic-ax/*"
 separateMajorMinor: false
-# Default branches to scan - can be overridden via RENOVATE_BASE_BRANCHES env var
-baseBranches: ["main", "release/*"]
+# Default branches to scan - can be overridden via RENOVATE_BASE_BRANCHES env var.
+# Regex patterns must be enclosed in slashes (/.../).
+baseBranchPatterns: ["main", "/^release\\/.*/"]
 
 # Dependencies that cannot be resolved (e.g. hosted on separate Enterprise instance)
 ignoreDeps:
@@ -14,60 +15,60 @@ ignoreDeps:
 
 # Enable managers for custom dependency detection
 enabledManagers:
-  - regex
+  - custom.regex
   - github-actions
 
 # Package-specific rules for registry URLs and update strategies
 packageRules:
   # Registry URL for @ax/ packages
-  - matchPackagePrefixes:
-      - "@ax/"
-    registryUrls: 
+  - matchPackageNames:
+      - "@ax/{/,}**"
+    registryUrls:
       - "https://registry.simatic-ax.siemens.io/"
   # Registry URL for @simatic-ax packages
-  - matchPackagePrefixes:
-      - "@simatic-ax"
-    registryUrls: 
+  - matchPackageNames:
+      - "@simatic-ax{/,}**"
+    registryUrls:
       - "https://npm.pkg.github.com/"
   # Major updates only on main branch
   - matchUpdateTypes:
       - major
-    baseBranches:
+    matchBaseBranches:
       - main
     groupName: "major dependencies"
   # Minor and patch updates on all branches (main and release/*)
   - matchUpdateTypes:
       - minor
       - patch
-    baseBranches:
-      - release/*
+    matchBaseBranches:
       - main
+      - "/^release\\/.*/"
     groupName: "non-major dependencies"
   # Bump version range for regex-managed dependencies
   - matchManagers:
-      - regex
-    matchCurrentVersion: \^\d+\.\d+\.\d+
+      - custom.regex
+    matchCurrentVersion: "/^\\^\\d+\\.\\d+\\.\\d+$/"
     rangeStrategy: bump
   # Group simatic-ax GitHub Actions together
   - matchManagers:
       - github-actions
-    matchPackagePrefixes:
-      - "simatic-ax/"
+    matchPackageNames:
+      - "simatic-ax/{/,}**"
     groupName: "simatic-ax actions"
   # Group third-party GitHub Actions together
   - matchManagers:
       - github-actions
-    matchPackagePrefixes:
-      - "actions/"
-      - "gaurav-nelson/"
+    matchPackageNames:
+      - "actions/{/,}**"
+      - "gaurav-nelson/{/,}**"
     groupName: "third-party actions"
   # Docker images from simatic-ax CI
   - matchManagers:
       - github-actions
     matchDatasources:
       - docker
-    matchPackagePrefixes:
-      - "ghcr.io/simatic-ax/"
+    matchPackageNames:
+      - "ghcr.io/simatic-ax/{/,}**"
     groupName: "simatic-ax docker images"
 
 # Lockfile maintenance: updates lockfile to resolve minor/patch changes
@@ -77,7 +78,7 @@ lockFileMaintenance:
   branchTopic: "renovate/minor-patch-updates"
   commitMessagePrefix: "chore(deps):"
   commitMessageAction: "Updates minor and patch versions in the apax-lock.json"
-  baseBranches: ["main", "release/*"]
+  baseBranchPatterns: ["main", "/^release\\/.*/"]
 
 # Allow specific commands for post-upgrade tasks
 allowedCommands:
@@ -98,8 +99,8 @@ postUpgradeTasks:
 # Custom manager: regex-based dependency detection in apax.yml
 customManagers:
   - customType: regex
-    fileMatch:
-      - "apax.yml"
+    managerFilePatterns:
+      - "/apax\\.yml$/"
     matchStrings:
       - "['\"](?<depName>@(ax|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+)"
     datasourceTemplate: npm
