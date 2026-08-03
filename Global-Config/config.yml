@@ -22,8 +22,15 @@ enabledManagers:
   - custom.regex
   - github-actions
 
-# Package-specific rules for registry URLs and update strategies
+# Package-specific rules for registry URLs and update strategies.
+#
+# Rule ordering matters: Renovate applies rules top-down and later rules
+# override earlier ones for the same field (e.g. groupName). We therefore
+# apply the generic major/non-major grouping FIRST and then let the more
+# specific domain rules (actions, docker images) override the groupName so
+# that CI-related updates land in their own PRs, separate from library deps.
 packageRules:
+  # --- Registry URLs (do not set groupName) ---
   # Registry URL for @ax/ packages
   - matchPackageNames:
       - "@ax/{/,}**"
@@ -34,6 +41,8 @@ packageRules:
       - "@simatic-ax{/,}**"
     registryUrls:
       - "https://npm.pkg.github.com/"
+
+  # --- Generic grouping by update type (applied first, may be overridden below) ---
   # Major updates only on main branch
   - matchUpdateTypes:
       - major
@@ -48,16 +57,39 @@ packageRules:
       - main
       - "/^release\\/.*/"
     groupName: "non-major dependencies"
-  # Bump version range for regex-managed dependencies
+
+  # --- Range strategy for regex-managed apax dependencies ---
   - matchManagers:
       - custom.regex
     matchCurrentVersion: "/^\\^\\d+\\.\\d+\\.\\d+$/"
     rangeStrategy: bump
+
+  # --- Domain-specific grouping (applied LAST so their groupName wins) ---
+  # These rules ensure that CI infrastructure updates (Actions, container
+  # images) always land in dedicated PRs, regardless of update type.
+  # matchBaseBranches preserves the "major only on main" policy while allowing
+  # non-major updates to also land on release branches.
+  #
   # Group simatic-ax GitHub Actions together
   - matchManagers:
       - github-actions
     matchPackageNames:
       - "simatic-ax/{/,}**"
+    matchUpdateTypes:
+      - major
+    matchBaseBranches:
+      - main
+    groupName: "simatic-ax actions"
+  - matchManagers:
+      - github-actions
+    matchPackageNames:
+      - "simatic-ax/{/,}**"
+    matchUpdateTypes:
+      - minor
+      - patch
+    matchBaseBranches:
+      - main
+      - "/^release\\/.*/"
     groupName: "simatic-ax actions"
   # Group third-party GitHub Actions together
   - matchManagers:
@@ -65,6 +97,22 @@ packageRules:
     matchPackageNames:
       - "actions/{/,}**"
       - "gaurav-nelson/{/,}**"
+    matchUpdateTypes:
+      - major
+    matchBaseBranches:
+      - main
+    groupName: "third-party actions"
+  - matchManagers:
+      - github-actions
+    matchPackageNames:
+      - "actions/{/,}**"
+      - "gaurav-nelson/{/,}**"
+    matchUpdateTypes:
+      - minor
+      - patch
+    matchBaseBranches:
+      - main
+      - "/^release\\/.*/"
     groupName: "third-party actions"
   # Docker images from simatic-ax CI
   - matchManagers:
@@ -73,6 +121,23 @@ packageRules:
       - docker
     matchPackageNames:
       - "ghcr.io/simatic-ax/{/,}**"
+    matchUpdateTypes:
+      - major
+    matchBaseBranches:
+      - main
+    groupName: "simatic-ax docker images"
+  - matchManagers:
+      - github-actions
+    matchDatasources:
+      - docker
+    matchPackageNames:
+      - "ghcr.io/simatic-ax/{/,}**"
+    matchUpdateTypes:
+      - minor
+      - patch
+    matchBaseBranches:
+      - main
+      - "/^release\\/.*/"
     groupName: "simatic-ax docker images"
 
 # Lockfile maintenance: updates lockfile to resolve minor/patch changes
