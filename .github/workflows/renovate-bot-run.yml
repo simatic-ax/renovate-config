@@ -7,9 +7,10 @@ on:
   workflow_dispatch:
     inputs:
       target-repo:
-        description: 'Pick a specific repo to execute renovate on (e.g. simatic-ax/<repo-name>)'
-        required: true
+        description: 'Pick a specific repo to execute renovate on (e.g. simatic-ax/<repo-name>). Leave empty to run on all repos (autodiscover).'
+        required: false
         type: string
+        default: ''
       target-branch:
         description: 'Pick a specific branch to execute renovate on (leave empty for default: main, release/*)'
         required: false
