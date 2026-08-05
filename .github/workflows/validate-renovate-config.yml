@@ -18,11 +18,12 @@ on:
 jobs:
   validate-config:
     runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/simatic-ax/ci-images/apax-ci-image:4.3.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
       - name: Validate Renovate Configuration
-        uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.0.1
-        with:
-          config_file_path: Global-Config/config.yml
+        shell: bash
+        run: renovate-config-validator Global-Config/config.yml
