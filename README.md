@@ -206,7 +206,7 @@ This repository includes two main workflows for Renovate management:
 **Purpose:** Production Renovate execution across all SIMATIC AX repositories
 
 **Triggers:**
-- **Scheduled:** Every Sunday at 15:00 UTC
+- **Scheduled:** Daily at 03:00 UTC
 - **Manual:** workflow_dispatch with optional target repository and branch selection
 
 **Inputs (Manual Trigger Only):**
@@ -255,7 +255,7 @@ This repository includes two main workflows for Renovate management:
 
 ### Production Updates
 
-- **Automatic:** Renovate runs every Sunday at 15:00 UTC across all SIMATIC AX repositories using default branches
+- **Automatic:** Renovate runs daily at 03:00 UTC across all SIMATIC AX repositories using default branches
 - **Manual Targeting:** Use workflow_dispatch to:
   - Target a specific repository
   - Test on a custom branch (e.g., feature branch, test branch)
@@ -264,7 +264,7 @@ This repository includes two main workflows for Renovate management:
 ## Workflow Triggers
 
 ### Automatic Execution
-- **Schedule:** Every Sunday at 15:00 UTC  
+- **Schedule:** Daily at 03:00 UTC  
 - **Scope:** All repositories matching `autodiscoverFilter`
 - **Trigger:** GitHub Actions cron schedule
 
