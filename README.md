@@ -38,8 +38,10 @@ enabledManagers:
 
 ```yaml
 packageRules:
-  - matchPackagePrefixes:
-      - "@ax/"
+  - matchPackageNames:
+      - "@ax/{/,}**"
+      - "@ax-as/{/,}**"   # scope introduced with 2610
+      - "@ax-mc/{/,}**"   # scope introduced with 2610
     registryUrls: 
       - "https://registry.simatic-ax.siemens.io/"
   - matchPackagePrefixes:
@@ -66,6 +68,7 @@ packageRules:
     - release/*
     - main
   groupName: "non-major dependencies"
+  automerge: true   # merged automatically once all required checks pass
 ```
 
 #### Custom Managers
@@ -76,7 +79,7 @@ customManagers:
     fileMatch:
       - "apax.yml"
     matchStrings:
-      - "['\"](?<depName>@(ax|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+)"
+      - "['\"](?<depName>@(ax|ax-as|ax-mc|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+)"
     datasourceTemplate: npm
 ```
 
@@ -295,15 +298,16 @@ This repository includes two main workflows for Renovate management:
 - Integration with security scanning tools
 
 ### Automerge Rules
-Configure automatic merging for specific update types:
+Minor and patch updates (including the lockfile maintenance) are merged automatically by the global configuration as soon as all required checks pass. Major updates always require a manual review.
+
+A repository can disable or restrict automerge in its own `renovate.json`, e.g.:
 
 ```json
 {
   "packageRules": [
     {
-      "matchUpdateTypes": ["patch"],
-      "matchPackagePatterns": ["^@simatic-ax/"],
-      "automerge": true
+      "matchUpdateTypes": ["minor"],
+      "automerge": false
     }
   ]
 }
