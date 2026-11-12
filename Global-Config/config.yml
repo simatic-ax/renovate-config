@@ -16,6 +16,8 @@ prHourlyLimit: 0
 rebaseWhen: "behind-base-branch"
 # Renovate merges itself (using the bot's ruleset bypass); GitHub native auto-merge would wait for the required review.
 platformAutomerge: false
+# Never propose prerelease versions (e.g. -rc.N) as update targets.
+ignoreUnstable: true
 # Default branches to scan - can be overridden via RENOVATE_BASE_BRANCHES env var.
 # Regex patterns must be enclosed in slashes (/.../).
 baseBranches: ["main", "/^release\\/.*/"]
@@ -189,7 +191,8 @@ customManagers:
     # Auto-migrating the deprecated fileMatch wraps the regex in a second pair of slashes, which never matches.
     managerFilePatterns:
       - "/(^|/)apax\\.yml$/"
+    # Only stable versions; prerelease pins (e.g. 2610.0.0-rc.3) are left untouched.
     matchStrings:
-      - "['\"](?<depName>@(ax|ax-as|ax-mc|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.\\-]+)?)"
+      - "['\"](?<depName>@(ax|ax-as|ax-mc|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+)[ \\t]*(#[^\\r\\n]*)?(\\r?\\n|$)"
     datasourceTemplate: npm
 
