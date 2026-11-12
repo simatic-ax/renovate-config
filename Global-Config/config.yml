@@ -166,7 +166,6 @@ lockFileMaintenance:
   branchTopic: "renovate/minor-patch-updates"
   commitMessagePrefix: "chore(deps):"
   commitMessageAction: "Updates minor and patch versions in the apax-lock.json"
-  baseBranches: ["main", "/^release\\/.*/"]
 
 # Allow specific commands for post-upgrade tasks
 allowedCommands:
@@ -187,9 +186,10 @@ postUpgradeTasks:
 # Custom manager: regex-based dependency detection in apax.yml
 customManagers:
   - customType: regex
-    fileMatch:
-      - "/apax\\.yml$/"
+    # Auto-migrating the deprecated fileMatch wraps the regex in a second pair of slashes, which never matches.
+    managerFilePatterns:
+      - "/(^|/)apax\\.yml$/"
     matchStrings:
-      - "['\"](?<depName>@(ax|ax-as|ax-mc|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+)"
+      - "['\"](?<depName>@(ax|ax-as|ax-mc|simatic-ax)/[a-z0-9\\-]+)['\"]\\s*:\\s*(?<currentValue>\\^?\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.\\-]+)?)"
     datasourceTemplate: npm
 
