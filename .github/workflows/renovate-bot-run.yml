@@ -1,9 +1,9 @@
 name: renovate-bot-run
 
 on:
-  # Runs every Sunday 3:00pm UTC
+  # Runs daily 3:00am UTC so the Monday run matches the lockFileMaintenance schedule ("before 4am on Monday")
   schedule:
-    - cron: '0 15 * * 0'
+    - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
       target-repo:
